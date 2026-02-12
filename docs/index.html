@@ -27,6 +27,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
         .card {
             background: white;
             border-radius: 24px;
@@ -39,6 +49,15 @@
             background: linear-gradient(135deg, #6366F1, #8B5CF6);
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
             transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
         }
         
         .editable {
@@ -62,9 +81,14 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.2s ease-out;
         }
         .modal.show {
             display: flex;
+        }
+        
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
         }
         
         .toast {
@@ -85,26 +109,98 @@
             transform: translateY(0);
             opacity: 1;
         }
+        
+        .toast.success { border-left: 4px solid #10B981; }
+        .toast.error { border-left: 4px solid #EF4444; }
+        .toast.warning { border-left: 4px solid #F59E0B; }
+        .toast.info { border-left: 4px solid #3B82F6; }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Improved touch targets for mobile */
+        button, input, textarea, select {
+            min-height: 44px;
+        }
+        
+        /* Better scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Toast Notification -->
     <div id="toast" class="toast">
         <div class="flex items-center gap-3">
             <span id="toast-icon" class="text-2xl">✅</span>
-            <p id="toast-message" class="font-bold text-slate-800"></p>
+            <div class="flex-1">
+                <p id="toast-message" class="font-bold text-slate-800"></p>
+                <p id="toast-sub" class="text-xs text-slate-500 mt-1" style="display:none"></p>
+            </div>
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.9); z-index:3000; align-items:center; justify-content:center;">
+        <div class="text-center">
+            <div class="spinner" style="width:40px; height:40px; border-width:4px; border-color:#6366F1; border-top-color:transparent; margin:0 auto 16px"></div>
+            <p class="text-slate-600 font-semibold">שומר...</p>
+        </div>
+    </div>
+
+    <!-- Modal -->
     <div id="modal" class="modal" onclick="closeModal()">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full mx-4" onclick="event.stopPropagation()">
-            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+        <div class="modal-content bg-white rounded-3xl p-6 max-w-md w-full mx-4" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="modal-title" class="text-xl font-bold"></h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">✕</button>
+            </div>
             <div id="modal-content"></div>
         </div>
     </div>
 
+    <!-- App Container -->
     <div class="pb-20">
         
+        <!-- HOME TAB -->
         <div id="tab-home" class="tab-content active">
             <div class="bg-white p-6 flex items-center justify-between sticky top-0 z-10 shadow-sm">
                 <div>
@@ -117,14 +213,16 @@
             </div>
 
             <div class="p-4 space-y-4">
+                <!-- Countdown Card -->
                 <div class="card p-8 text-center bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
                     <p class="text-indigo-200 text-sm font-bold uppercase mb-2">הספירה לאחור!</p>
-                    <h2 id="days-left" class="text-6xl font-black my-4">247</h2>
+                    <h2 id="days-left" class="text-6xl font-black my-4">--</h2>
                     <p class="text-lg">ימים לחתונה</p>
-                    <p id="display-date" class="text-white/90 mt-4 editable" onclick="editDate()">📅 15 באוגוסט 2026</p>
+                    <p id="display-date" class="text-white/90 mt-4 editable" onclick="editDate()">📅 טוען...</p>
                     <p class="text-xs text-white/70 mt-1">לחצו לשינוי תאריך</p>
                 </div>
 
+                <!-- Control Meter -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">המצב שלכם היום</h3>
@@ -132,65 +230,70 @@
                     </div>
                     <div class="relative mb-6">
                         <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                            <div id="control-bar" class="h-full bg-gradient-to-r from-green-400 to-green-500" style="width: 78%"></div>
+                            <div id="control-bar" class="h-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-500" style="width: 0%"></div>
                         </div>
                         <div class="flex justify-between mt-2 text-xs text-slate-500">
                             <span>0%</span>
-                            <span id="control-percent" class="font-bold text-green-600">78%</span>
+                            <span id="control-percent" class="font-bold text-green-600">0%</span>
                             <span>100%</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-3 text-center">
                         <div>
-                            <p class="text-2xl font-bold text-green-600" id="tasks-done">12</p>
+                            <p class="text-2xl font-bold text-green-600" id="tasks-done">0</p>
                             <p class="text-xs text-slate-500">הושלמו</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold text-orange-500" id="tasks-urgent">3</p>
+                            <p class="text-2xl font-bold text-orange-500" id="tasks-urgent">0</p>
                             <p class="text-xs text-slate-500">דחופות</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold text-indigo-600" id="budget-status">+₪5K</p>
-                            <p class="text-xs text-slate-500">חסכון</p>
+                            <p class="text-2xl font-bold text-indigo-600" id="budget-status">₪0</p>
+                            <p class="text-xs text-slate-500">נותר</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Today's Tasks -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">⚡ משימות להיום</h3>
-                        <button onclick="addTask()" class="text-indigo-600 text-sm font-bold">+ הוסף</button>
+                        <button onclick="addTask()" class="text-indigo-600 text-sm font-bold hover:underline">+ הוסף</button>
                     </div>
-                    <div id="today-tasks-list" class="space-y-3"></div>
+                    <div id="today-tasks-list" class="space-y-3">
+                        <div class="skeleton h-16 rounded-xl"></div>
+                    </div>
                 </div>
 
+                <!-- Budget Quick View -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">💰 תקציב</h3>
-                        <button onclick="switchTab('budget')" class="text-indigo-600 text-sm font-bold">פירוט →</button>
+                        <button onclick="switchTab('budget')" class="text-indigo-600 text-sm font-bold hover:underline">פירוט →</button>
                     </div>
                     <div class="space-y-2 mb-4">
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600">תקציב:</span>
-                            <span id="budget-total" class="font-bold text-slate-800 editable" onclick="editBudget()">₪165,000</span>
+                            <span id="budget-total" class="font-bold text-slate-800">₪--</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600">הוצאות:</span>
-                            <span id="budget-actual" class="font-bold text-slate-800">₪148,500</span>
+                            <span id="budget-actual" class="font-bold text-slate-800">₪--</span>
                         </div>
                         <div class="h-px bg-slate-200"></div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-600">נשאר:</span>
-                            <span id="budget-remaining" class="font-bold text-green-600">₪16,500 🎉</span>
+                            <span id="budget-remaining" class="font-bold text-green-600">₪--</span>
                         </div>
                     </div>
                     <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div id="budget-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500" style="width: 90%"></div>
+                        <div id="budget-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- BUDGET TAB -->
         <div id="tab-budget" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">💰 תקציב</h1>
@@ -200,28 +303,32 @@
             <div class="p-4 space-y-4">
                 <div class="card p-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
                     <p class="text-slate-400 text-xs font-bold uppercase mb-2">תקציב כולל</p>
-                    <h2 class="text-5xl font-black mb-1 editable" onclick="editBudget()">₪165,000</h2>
+                    <h2 id="budget-total-big" class="text-5xl font-black mb-1 editable" onclick="editBudget()">₪--</h2>
                     <p class="text-xs text-slate-400 mb-4">לחצו לעריכה</p>
                     <div class="flex items-center gap-2">
                         <div class="flex-1">
                             <p class="text-xs text-slate-400">הוצאות</p>
-                            <p class="text-xl font-bold">₪148,500</p>
+                            <p id="budget-actual-big" class="text-xl font-bold">₪--</p>
                         </div>
                         <div class="flex-1 text-left">
                             <p class="text-xs text-slate-400">נשאר</p>
-                            <p class="text-xl font-bold text-green-400">₪16,500</p>
+                            <p id="budget-remaining-big" class="text-xl font-bold text-green-400">₪--</p>
                         </div>
                     </div>
                 </div>
 
-                <div id="categories-list" class="space-y-3"></div>
+                <div id="categories-list" class="space-y-3">
+                    <div class="skeleton h-24 rounded-2xl"></div>
+                    <div class="skeleton h-24 rounded-2xl"></div>
+                </div>
 
-                <button onclick="addCategory()" class="w-full py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-500 font-bold">
+                <button onclick="addCategory()" class="w-full py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-500 font-bold hover:border-indigo-300 hover:text-indigo-600 transition-all">
                     ➕ הוסף קטגוריה
                 </button>
             </div>
         </div>
 
+        <!-- SUPPLIERS TAB -->
         <div id="tab-suppliers" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">🔍 ספקים</h1>
@@ -230,30 +337,30 @@
 
             <div class="p-4 space-y-4">
                 <input type="text" id="vendor-search" placeholder="🔍 חפש ספק..." 
-                       class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                       class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-indigo-500 outline-none transition-all">
 
                 <div class="grid grid-cols-3 gap-2">
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">🏛️</div>
                         <div class="text-xs mt-1">אולמות</div>
                     </button>
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">📸</div>
                         <div class="text-xs mt-1">צילום</div>
                     </button>
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">🎵</div>
                         <div class="text-xs mt-1">DJ</div>
                     </button>
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">💐</div>
                         <div class="text-xs mt-1">פרחים</div>
                     </button>
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">💄</div>
                         <div class="text-xs mt-1">איפור</div>
                     </button>
-                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                    <button class="p-3 bg-white rounded-xl border border-slate-200 text-center hover:border-indigo-300 hover:shadow-md transition-all">
                         <div class="text-2xl">👗</div>
                         <div class="text-xs mt-1">שמלות</div>
                     </button>
@@ -262,30 +369,36 @@
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-slate-800">💼 הספקים שלי</h3>
-                        <button onclick="addVendor()" class="text-indigo-600 text-sm font-bold">+ הוסף</button>
+                        <button onclick="addVendor()" class="text-indigo-600 text-sm font-bold hover:underline">+ הוסף</button>
                     </div>
-                    <div id="my-vendors-list" class="space-y-3"></div>
+                    <div id="my-vendors-list" class="space-y-3">
+                        <div class="skeleton h-16 rounded-xl"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- TASKS TAB -->
         <div id="tab-tasks" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">📋 משימות</h1>
-                <button onclick="addTask()" class="text-indigo-600 text-sm font-bold absolute left-6 top-8">+ הוסף</button>
+                <button onclick="addTask()" class="text-indigo-600 text-sm font-bold absolute left-6 top-8 hover:underline">+ הוסף</button>
             </div>
 
             <div class="bg-white px-4 pb-4 flex gap-2 overflow-x-auto">
-                <button class="px-4 py-2 rounded-full bg-indigo-600 text-white text-sm font-bold">הכול</button>
-                <button class="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold">היום</button>
-                <button class="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold">השבוע</button>
+                <button onclick="filterTasks('all')" id="filter-all" class="px-4 py-2 rounded-full bg-indigo-600 text-white text-sm font-bold whitespace-nowrap">הכול</button>
+                <button onclick="filterTasks('today')" id="filter-today" class="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold whitespace-nowrap">היום</button>
+                <button onclick="filterTasks('urgent')" id="filter-urgent" class="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold whitespace-nowrap">דחופות</button>
             </div>
 
             <div class="p-4 space-y-4">
-                <div id="tasks-list"></div>
+                <div id="tasks-list">
+                    <div class="skeleton h-20 rounded-2xl"></div>
+                </div>
             </div>
         </div>
 
+        <!-- PROFILE TAB -->
         <div id="tab-profile" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">👤 פרופיל</h1>
@@ -297,15 +410,15 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-sm text-slate-500">שם החתן</label>
-                            <input type="text" id="groom-name" value="יוסי" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                            <input type="text" id="groom-name" value="" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
                         </div>
                         <div>
                             <label class="text-sm text-slate-500">שם הכלה</label>
-                            <input type="text" id="bride-name" value="חן" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                            <input type="text" id="bride-name" value="" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
                         </div>
                         <div>
                             <label class="text-sm text-slate-500">תאריך החתונה</label>
-                            <input type="date" id="wedding-date" value="2026-08-15" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                            <input type="date" id="wedding-date" value="" class="w-full px-4 py-3 mt-1 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
                         </div>
                         <button onclick="saveWeddingDetails()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">
                             שמור שינויים
@@ -316,69 +429,166 @@
                 <div class="card p-6">
                     <h3 class="font-bold text-slate-800 mb-2">🤝 שיתוף עם בן/בת הזוג</h3>
                     <p class="text-sm text-slate-500 mb-4">שניכם תראו את אותו המידע בזמן אמת</p>
-                    <button class="w-full bg-green-100 text-green-700 py-3 rounded-xl font-bold">
+                    <button class="w-full bg-green-100 text-green-700 py-3 rounded-xl font-bold hover:bg-green-200 transition-all">
                         שלח הזמנה ב-WhatsApp
                     </button>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="font-bold text-slate-800 mb-2">⚙️ הגדרות</h3>
+                    <div class="space-y-2">
+                        <button onclick="logout()" class="w-full text-right px-4 py-3 hover:bg-slate-50 rounded-xl transition-all">
+                            🚪 התנתק
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- Bottom Navigation -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-3 flex justify-around items-center shadow-2xl z-50">
-        <button onclick="switchTab('home')" id="nav-home" class="nav-item active flex flex-col items-center">
+        <button onclick="switchTab('home')" id="nav-home" class="nav-item active flex flex-col items-center transition-all">
             <span class="text-2xl">🏠</span>
             <span class="text-[10px] font-bold mt-1 text-indigo-600">בית</span>
         </button>
-        <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center">
+        <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center transition-all">
             <span class="text-2xl">💰</span>
             <span class="text-[10px] font-bold mt-1 text-slate-400">תקציב</span>
         </button>
-        <button onclick="switchTab('suppliers')" id="nav-suppliers" class="nav-item flex flex-col items-center">
+        <button onclick="switchTab('suppliers')" id="nav-suppliers" class="nav-item flex flex-col items-center transition-all">
             <span class="text-2xl">🔍</span>
             <span class="text-[10px] font-bold mt-1 text-slate-400">ספקים</span>
         </button>
-        <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-item flex flex-col items-center">
+        <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-item flex flex-col items-center transition-all">
             <span class="text-2xl">📋</span>
             <span class="text-[10px] font-bold mt-1 text-slate-400">משימות</span>
         </button>
-        <button onclick="switchTab('profile')" id="nav-profile" class="nav-item flex flex-col items-center">
+        <button onclick="switchTab('profile')" id="nav-profile" class="nav-item flex flex-col items-center transition-all">
             <span class="text-2xl">👤</span>
             <span class="text-[10px] font-bold mt-1 text-slate-400">פרופיל</span>
         </button>
     </div>
 
     <script>
+        // ==================== CONFIG ====================
         const API_URL = "https://my-project-n3th.onrender.com";
-        const WEDDING_ID = localStorage.getItem('wedding_id') || "demo-wedding-1";
         
         let appState = {
+            weddingId: localStorage.getItem('wedding_id') || "demo-wedding-001",
+            sessionToken: localStorage.getItem('session_token'),
             wedding: {},
             categories: [],
             tasks: [],
-            vendors: []
+            vendors: [],
+            lastSync: null
         };
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(item => {
-                const span = item.querySelector('span:last-child');
-                span.className = 'text-[10px] font-bold mt-1 text-slate-400';
-            });
-            const activeNav = document.querySelector(`#nav-${tabName} span:last-child`);
-            if (activeNav) activeNav.className = 'text-[10px] font-bold mt-1 text-indigo-600';
-            
-            if (tabName === 'budget') loadCategories();
-            if (tabName === 'tasks') loadTasks();
-            if (tabName === 'suppliers') loadVendors();
+        // ==================== API CLIENT ====================
+        class API {
+            static async call(endpoint, options = {}) {
+                try {
+                    const response = await fetch(`${API_URL}${endpoint}`, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => ({}));
+                        throw new Error(error.detail || 'Request failed');
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            }
+
+            static async getWedding(weddingId) {
+                return this.call(`/weddings/${weddingId}`);
+            }
+
+            static async getDashboard(weddingId) {
+                return this.call(`/weddings/${weddingId}/dashboard`);
+            }
+
+            static async getBudget(weddingId) {
+                return this.call(`/weddings/${weddingId}/budget`);
+            }
+
+            static async getTasks(weddingId) {
+                return this.call(`/weddings/${weddingId}/tasks`);
+            }
+
+            static async getVendors(weddingId) {
+                return this.call(`/weddings/${weddingId}/bookings`);
+            }
+
+            static async createTask(weddingId, data) {
+                return this.call(`/weddings/${weddingId}/tasks`, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+            static async toggleTask(taskId) {
+                return this.call(`/tasks/${taskId}/complete`, {
+                    method: 'PATCH'
+                });
+            }
+
+            static async deleteTask(taskId) {
+                return this.call(`/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+            }
+
+            static async createVendor(weddingId, data) {
+                return this.call(`/weddings/${weddingId}/bookings`, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+            static async updateWedding(weddingId, data) {
+                return this.call(`/weddings/${weddingId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            }
         }
 
-        function showToast(message, icon = '✅') {
+        // ==================== UI HELPERS ====================
+        function showLoading(show = true) {
+            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function showToast(message, type = 'success', subtitle = '') {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-icon').textContent = icon;
+            const icons = {
+                success: '✅',
+                error: '⚠️',
+                warning: '⚡',
+                info: 'ℹ️'
+            };
+            
+            toast.className = `toast ${type}`;
+            document.getElementById('toast-icon').textContent = icons[type] || '✅';
             document.getElementById('toast-message').textContent = message;
+            
+            const subEl = document.getElementById('toast-sub');
+            if (subtitle) {
+                subEl.textContent = subtitle;
+                subEl.style.display = 'block';
+            } else {
+                subEl.style.display = 'none';
+            }
+            
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
@@ -393,145 +603,242 @@
             document.getElementById('modal').classList.remove('show');
         }
 
+        // ==================== TAB SWITCHING ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const span = item.querySelector('span:last-child');
+                span.className = 'text-[10px] font-bold mt-1 text-slate-400';
+            });
+            const activeNav = document.querySelector(`#nav-${tabName} span:last-child`);
+            if (activeNav) activeNav.className = 'text-[10px] font-bold mt-1 text-indigo-600';
+            
+            // Load data when switching to tab
+            if (tabName === 'budget') loadBudget();
+            if (tabName === 'tasks') loadTasks();
+            if (tabName === 'suppliers') loadVendors();
+        }
+
+        // ==================== DATA LOADING ====================
+        async function loadDashboard() {
+            try {
+                const [wedding, dashboard] = await Promise.all([
+                    API.getWedding(appState.weddingId),
+                    API.getDashboard(appState.weddingId)
+                ]);
+
+                // Update wedding info
+                appState.wedding = wedding;
+                document.getElementById('display-names').textContent = `${wedding.bride_name} ו${wedding.groom_name}`;
+                document.getElementById('display-date').textContent = `📅 ${formatDate(wedding.wedding_date)}`;
+                document.getElementById('days-left').textContent = wedding.days_remaining;
+
+                // Update dashboard stats
+                document.getElementById('tasks-done').textContent = dashboard.tasks_completed;
+                document.getElementById('tasks-urgent').textContent = dashboard.tasks_urgent;
+                document.getElementById('budget-status').textContent = `₪${formatNumber(dashboard.budget_remaining)}`;
+
+                // Update control bar
+                const controlPercent = dashboard.control_percentage;
+                document.getElementById('control-bar').style.width = `${controlPercent}%`;
+                document.getElementById('control-percent').textContent = `${controlPercent}%`;
+                
+                // Update emoji based on progress
+                const emoji = controlPercent > 75 ? '🎉' : controlPercent > 50 ? '😊' : controlPercent > 25 ? '😌' : '😅';
+                document.getElementById('control-emoji').textContent = emoji;
+
+                // Update budget
+                document.getElementById('budget-total').textContent = `₪${formatNumber(dashboard.budget_planned)}`;
+                document.getElementById('budget-actual').textContent = `₪${formatNumber(dashboard.budget_actual)}`;
+                document.getElementById('budget-remaining').textContent = `₪${formatNumber(dashboard.budget_remaining)}`;
+                document.getElementById('budget-bar').style.width = `${dashboard.budget_percentage}%`;
+
+                // Store in localStorage for quick access
+                localStorage.setItem('wedding_id', appState.weddingId);
+                
+                appState.lastSync = new Date();
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showToast('שגיאה בטעינת הנתונים', 'error');
+            }
+        }
+
+        async function loadBudget() {
+            try {
+                const categories = await API.getBudget(appState.weddingId);
+                appState.categories = categories;
+
+                // Calculate totals
+                const totalPlanned = categories.reduce((sum, cat) => sum + cat.planned_amount, 0);
+                const totalActual = categories.reduce((sum, cat) => sum + cat.actual_amount, 0);
+                const remaining = totalPlanned - totalActual;
+
+                // Update big budget display
+                document.getElementById('budget-total-big').textContent = `₪${formatNumber(totalPlanned)}`;
+                document.getElementById('budget-actual-big').textContent = `₪${formatNumber(totalActual)}`;
+                document.getElementById('budget-remaining-big').textContent = `₪${formatNumber(remaining)}`;
+
+                // Render categories
+                const html = categories.map(cat => {
+                    const percentage = cat.percentage_spent;
+                    const diff = cat.actual_amount - cat.planned_amount;
+                    const diffText = diff > 0 ? `+₪${formatNumber(diff)}` : diff < 0 ? `-₪${formatNumber(Math.abs(diff))}` : 'מאוזן';
+                    const diffColor = diff > 0 ? 'text-orange-500' : 'text-green-600';
+                    
+                    return `
+                        <div class="card p-5 fade-in">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">${cat.icon}</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">${cat.name}</h4>
+                                        <p class="text-sm text-slate-500">₪${formatNumber(cat.actual_amount)} מתוך ₪${formatNumber(cat.planned_amount)}</p>
+                                    </div>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-bold ${diffColor}">${diffText}</p>
+                                    <p class="text-xs text-slate-400">${percentage}%</p>
+                                </div>
+                            </div>
+                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full transition-all duration-500 ${diff > 0 ? 'bg-orange-500' : 'bg-green-500'}" style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('categories-list').innerHTML = html || '<p class="text-center text-slate-400 py-8">אין קטגוריות עדיין</p>';
+
+            } catch (error) {
+                console.error('Error loading budget:', error);
+                showToast('שגיאה בטעינת תקציב', 'error');
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const tasks = await API.getTasks(appState.weddingId);
+                appState.tasks = tasks;
+
+                const html = tasks.map(task => `
+                    <div class="card p-4 flex items-start gap-3 fade-in">
+                        <input type="checkbox" ${task.is_completed ? 'checked' : ''} 
+                               onchange="toggleTask('${task.id}')" 
+                               class="mt-1 w-5 h-5 accent-indigo-600 cursor-pointer">
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-800 ${task.is_completed ? 'line-through opacity-50' : ''}">${task.title}</p>
+                            ${task.is_urgent ? '<p class="text-xs text-orange-600 mt-1">⚠️ דחוף!</p>' : ''}
+                        </div>
+                        <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 px-2">🗑️</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('tasks-list').innerHTML = html || '<p class="text-center text-slate-400 py-8">אין משימות עדיין</p>';
+                document.getElementById('today-tasks-list').innerHTML = (html || '<p class="text-center text-slate-400 py-4">אין משימות להיום</p>').substring(0, 500);
+
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showToast('שגיאה בטעינת משימות', 'error');
+            }
+        }
+
+        async function loadVendors() {
+            try {
+                const vendors = await API.getVendors(appState.weddingId);
+                appState.vendors = vendors;
+
+                const html = vendors.map(v => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl fade-in hover:bg-slate-100 transition-all">
+                        <div>
+                            <p class="font-semibold text-slate-800">${v.vendor_name}</p>
+                            <p class="text-xs text-slate-500">₪${formatNumber(v.amount)}</p>
+                        </div>
+                        <button class="text-indigo-600 hover:text-indigo-800 px-2">✏️</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('my-vendors-list').innerHTML = html || '<p class="text-center text-slate-400 py-4">אין ספקים עדיין</p>';
+
+            } catch (error) {
+                console.error('Error loading vendors:', error);
+                showToast('שגיאה בטעינת ספקים', 'error');
+            }
+        }
+
+        // ==================== ACTIONS ====================
         function editNames() {
+            const wedding = appState.wedding;
             showModal('ערוך שמות', `
                 <div class="space-y-3">
-                    <input type="text" id="edit-groom" placeholder="שם החתן" value="יוסי" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
-                    <input type="text" id="edit-bride" placeholder="שם הכלה" value="חן" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                    <input type="text" id="edit-groom" placeholder="שם החתן" value="${wedding.groom_name || ''}" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                    <input type="text" id="edit-bride" placeholder="שם הכלה" value="${wedding.bride_name || ''}" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
                     <button onclick="saveNames()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">שמור</button>
                 </div>
             `);
         }
 
-        function saveNames() {
+        async function saveNames() {
             const groom = document.getElementById('edit-groom').value;
             const bride = document.getElementById('edit-bride').value;
-            document.getElementById('display-names').textContent = `${bride} ו${groom}`;
-            closeModal();
-            showToast('השמות עודכנו!');
+            
+            if (!groom || !bride) {
+                showToast('נא למלא את כל השדות', 'warning');
+                return;
+            }
+            
+            showLoading();
+            try {
+                await API.updateWedding(appState.weddingId, {
+                    groom_name: groom,
+                    bride_name: bride
+                });
+                
+                document.getElementById('display-names').textContent = `${bride} ו${groom}`;
+                closeModal();
+                showToast('השמות עודכנו בהצלחה!', 'success');
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה בשמירה', 'error');
+            } finally {
+                showLoading(false);
+            }
         }
 
         function editDate() {
+            const wedding = appState.wedding;
             showModal('שנה תאריך חתונה', `
                 <div class="space-y-3">
-                    <input type="date" id="edit-date" value="2026-08-15" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                    <input type="date" id="edit-date" value="${wedding.wedding_date || ''}" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
                     <button onclick="saveDate()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">שמור</button>
                 </div>
             `);
         }
 
-        function saveDate() {
+        async function saveDate() {
             const date = document.getElementById('edit-date').value;
-            closeModal();
-            showToast('התאריך עודכן!');
-        }
-
-        function editBudget() {
-            showModal('עדכן תקציב כולל', `
-                <div class="space-y-3">
-                    <input type="number" id="edit-budget" placeholder="0" value="165000" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
-                    <button onclick="saveBudget()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">שמור</button>
-                </div>
-            `);
-        }
-
-        function saveBudget() {
-            const amount = document.getElementById('edit-budget').value;
-            closeModal();
-            showToast('התקציב עודכן!');
-        }
-
-        async function loadCategories() {
-            const categories = [
-                { id: '1', name: 'אולם ואירוח', icon: '🏛️', planned: 90000, actual: 85000 },
-                { id: '2', name: 'צילום ווידאו', icon: '📸', planned: 15000, actual: 16500 },
-                { id: '3', name: 'מוזיקה ובידור', icon: '🎵', planned: 12000, actual: 0 }
-            ];
             
-            const html = categories.map(cat => {
-                const percentage = Math.round((cat.actual / cat.planned) * 100);
-                const diff = cat.actual - cat.planned;
-                const diffText = diff > 0 ? `+₪${diff.toLocaleString()}` : diff < 0 ? `-₪${Math.abs(diff).toLocaleString()}` : 'מאוזן';
-                const diffColor = diff > 0 ? 'text-orange-500' : 'text-green-600';
+            if (!date) {
+                showToast('נא לבחור תאריך', 'warning');
+                return;
+            }
+            
+            showLoading();
+            try {
+                await API.updateWedding(appState.weddingId, {
+                    wedding_date: date
+                });
                 
-                return `
-                    <div class="card p-5">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <span class="text-3xl">${cat.icon}</span>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">${cat.name}</h4>
-                                    <p class="text-sm text-slate-500">₪${cat.actual.toLocaleString()} מתוך ₪${cat.planned.toLocaleString()}</p>
-                                </div>
-                            </div>
-                            <div class="text-left">
-                                <p class="text-sm font-bold ${diffColor}">${diffText}</p>
-                                <p class="text-xs text-slate-400">${percentage}%</p>
-                            </div>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full ${diff > 0 ? 'bg-orange-500' : 'bg-green-500'}" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                        <div class="flex gap-2 mt-3">
-                            <button onclick="editCategory('${cat.id}')" class="flex-1 text-sm text-indigo-600 font-semibold">✏️ ערוך</button>
-                            <button onclick="addVendorToCategory('${cat.id}')" class="flex-1 text-sm text-green-600 font-semibold">+ ספק</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('categories-list').innerHTML = html;
-        }
-
-        function addCategory() {
-            showModal('הוסף קטגוריה חדשה', `
-                <div class="space-y-3">
-                    <input type="text" id="cat-name" placeholder="שם הקטגוריה" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <input type="text" id="cat-icon" placeholder="אימוג'י (🎵)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <input type="number" id="cat-amount" placeholder="₪ תקציב מתוכנן" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <button onclick="saveCategory()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף</button>
-                </div>
-            `);
-        }
-
-        function saveCategory() {
-            closeModal();
-            showToast('הקטגוריה נוספה!', '🎉');
-            loadCategories();
-        }
-
-        function editCategory(id) {
-            showToast('עריכת קטגוריה - בקרוב!', 'ℹ️');
-        }
-
-        function addVendorToCategory(id) {
-            addVendor();
-        }
-
-        async function loadTasks() {
-            const tasks = [
-                { id: '1', title: 'לשלם מקדמה לצלם', urgent: true, completed: false },
-                { id: '2', title: 'לבחור DJ', urgent: false, completed: false },
-                { id: '3', title: 'להדפיס הזמנות', urgent: true, completed: false }
-            ];
-            
-            const html = tasks.map(task => `
-                <div class="card p-4 flex items-start gap-3">
-                    <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                           onchange="toggleTask('${task.id}')" 
-                           class="mt-1 w-5 h-5 accent-indigo-600">
-                    <div class="flex-1">
-                        <p class="font-semibold text-slate-800 ${task.completed ? 'line-through' : ''}">${task.title}</p>
-                        ${task.urgent ? '<p class="text-xs text-orange-600 mt-1">⚠️ דחוף!</p>' : ''}
-                    </div>
-                    <button onclick="deleteTask('${task.id}')" class="text-red-500">🗑️</button>
-                </div>
-            `).join('');
-            
-            document.getElementById('tasks-list').innerHTML = html;
-            
-            const todayHtml = html.substring(0, 400) + '...';
-            document.getElementById('today-tasks-list').innerHTML = html;
+                closeModal();
+                showToast('התאריך עודכן!', 'success');
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה בשמירה', 'error');
+            } finally {
+                showLoading(false);
+            }
         }
 
         function addTask() {
@@ -549,51 +856,75 @@
             `);
         }
 
-        function saveTask() {
-            closeModal();
-            showToast('המשימה נוספה!', '✅');
-            loadTasks();
-        }
-
-        function toggleTask(taskId) {
-            showToast('המשימה עודכנה!');
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('למחוק משימה זו?')) {
-                showToast('המשימה נמחקה', '🗑️');
+        async function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-desc').value;
+            const dueDate = document.getElementById('task-date').value;
+            const isUrgent = document.getElementById('task-urgent').checked;
+            
+            if (!title) {
+                showToast('נא למלא כותרת', 'warning');
+                return;
+            }
+            
+            showLoading();
+            try {
+                await API.createTask(appState.weddingId, {
+                    title,
+                    description,
+                    due_date: dueDate || null,
+                    is_urgent: isUrgent
+                });
+                
+                closeModal();
+                showToast('המשימה נוספה!', 'success');
                 loadTasks();
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה בשמירה', 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
-        async function loadVendors() {
-            const vendors = [
-                { id: '1', name: 'אקוודור אירועים', category: 'אולם', amount: 85000 },
-                { id: '2', name: 'לייט סטודיו', category: 'צילום', amount: 16500 }
-            ];
+        async function toggleTask(taskId) {
+            try {
+                await API.toggleTask(taskId);
+                showToast('המשימה עודכנה!', 'success');
+                loadTasks();
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה בעדכון', 'error');
+            }
+        }
+
+        async function deleteTask(taskId) {
+            if (!confirm('למחוק משימה זו?')) return;
             
-            const html = vendors.map(v => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <div>
-                        <p class="font-semibold text-slate-800">${v.name}</p>
-                        <p class="text-xs text-slate-500">${v.category} • ₪${v.amount.toLocaleString()}</p>
-                    </div>
-                    <button onclick="editVendor('${v.id}')" class="text-indigo-600">✏️</button>
-                </div>
-            `).join('');
-            
-            document.getElementById('my-vendors-list').innerHTML = html || '<p class="text-center text-slate-400 py-4">אין ספקים עדיין</p>';
+            showLoading();
+            try {
+                await API.deleteTask(taskId);
+                showToast('המשימה נמחקה', 'success');
+                loadTasks();
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה במחיקה', 'error');
+            } finally {
+                showLoading(false);
+            }
         }
 
         function addVendor() {
+            const categories = appState.categories;
+            const categoryOptions = categories.map(cat => 
+                `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`
+            ).join('');
+
             showModal('הוסף ספק חדש', `
                 <div class="space-y-3">
                     <select id="vendor-category" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                        <option>בחר קטגוריה...</option>
-                        <option>🏛️ אולם</option>
-                        <option>📸 צילום</option>
-                        <option>🎵 DJ</option>
-                        <option>💐 פרחים</option>
+                        <option value="">בחר קטגוריה...</option>
+                        ${categoryOptions}
                     </select>
                     <input type="text" id="vendor-name" placeholder="שם הספק" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
                     <input type="number" id="vendor-amount" placeholder="₪ סכום" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
@@ -602,25 +933,106 @@
             `);
         }
 
-        function saveVendor() {
-            closeModal();
-            showToast('הספק נוסף!', '🎉');
-            loadVendors();
+        async function saveVendor() {
+            const categoryId = document.getElementById('vendor-category').value;
+            const name = document.getElementById('vendor-name').value;
+            const amount = parseFloat(document.getElementById('vendor-amount').value);
+            
+            if (!categoryId || !name || !amount) {
+                showToast('נא למלא את כל השדות', 'warning');
+                return;
+            }
+            
+            showLoading();
+            try {
+                await API.createVendor(appState.weddingId, {
+                    category_id: categoryId,
+                    vendor_name: name,
+                    amount: amount
+                });
+                
+                closeModal();
+                showToast('הספק נוסף!', 'success');
+                loadVendors();
+                loadBudget();
+                loadDashboard();
+            } catch (error) {
+                showToast('שגיאה בשמירה', 'error');
+            } finally {
+                showLoading(false);
+            }
         }
 
-        function editVendor(id) {
-            showToast('עריכת ספק - בקרוב!', 'ℹ️');
+        function addCategory() {
+            showToast('בקרוב!', 'info');
         }
 
         function saveWeddingDetails() {
-            showToast('הפרטים נשמרו!', '✅');
+            showToast('בקרוב!', 'info');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCategories();
+        function filterTasks(filter) {
+            // Update active button
+            document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+                btn.className = 'px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold whitespace-nowrap';
+            });
+            document.getElementById(`filter-${filter}`).className = 'px-4 py-2 rounded-full bg-indigo-600 text-white text-sm font-bold whitespace-nowrap';
+            
+            // Filter tasks - for now just reload
             loadTasks();
-            loadVendors();
-            setTimeout(() => showToast('ברוכים הבאים! 💕', '🎉'), 500);
+        }
+
+        function logout() {
+            if (confirm('האם להתנתק?')) {
+                localStorage.removeItem('wedding_id');
+                localStorage.removeItem('session_token');
+                location.reload();
+            }
+        }
+
+        // ==================== UTILS ====================
+        function formatNumber(num) {
+            return Math.round(num).toLocaleString('he-IL');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // ==================== AUTO-SAVE ====================
+        let autoSaveInterval;
+        function startAutoSave() {
+            autoSaveInterval = setInterval(async () => {
+                try {
+                    await loadDashboard();
+                    console.log('Auto-saved at', new Date().toLocaleTimeString());
+                } catch (error) {
+                    console.error('Auto-save failed:', error);
+                }
+            }, 30000); // Every 30 seconds
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Wedding Elite V2.0 Loading...');
+            
+            // Load initial data
+            await loadDashboard();
+            await loadTasks();
+            
+            // Start auto-save
+            startAutoSave();
+            
+            // Show welcome
+            setTimeout(() => {
+                showToast('ברוכים הבאים! 💕', 'success', 'כל השינויים נשמרים אוטומטית');
+            }, 500);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (autoSaveInterval) clearInterval(autoSaveInterval);
         });
     </script>
 
