@@ -12,6 +12,7 @@ import sqlite3
 from contextlib import contextmanager
 import json
 import asyncio
+import uuid
 
 app = FastAPI(
     title="Wedding Elite V2.0 API",
@@ -41,6 +42,10 @@ app.add_middleware(
 
 # ==================== DATABASE ====================
 DATABASE = "wedding_elite_v2.db"
+
+def generate_id() -> str:
+    """Generate unique ID using UUID4"""
+    return str(uuid.uuid4())
 
 @contextmanager
 def get_db():
