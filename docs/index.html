@@ -349,16 +349,10 @@
     </div>
 
     <script>
+        // 1. הגדרת הכתובת לשרת שלך ב-Render
         const API_URL = "https://my-project-n3th.onrender.com";
-        const WEDDING_ID = localStorage.getItem('wedding_id') || "demo-wedding-1";
         
-        let appState = {
-            wedding: {},
-            categories: [],
-            tasks: [],
-            vendors: []
-        };
-
+        // פונקציות עזר
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
@@ -370,6 +364,7 @@
             const activeNav = document.querySelector(`#nav-${tabName} span:last-child`);
             if (activeNav) activeNav.className = 'text-[10px] font-bold mt-1 text-indigo-600';
             
+            // טעינת נתונים אמיתית מהשרת במעבר לטאב
             if (tabName === 'budget') loadCategories();
             if (tabName === 'tasks') loadTasks();
             if (tabName === 'suppliers') loadVendors();
@@ -392,6 +387,157 @@
         function closeModal() {
             document.getElementById('modal').classList.remove('show');
         }
+
+        // --- לוגיקת ספקים (Vendors) מול השרת ---
+
+        // קריאת ספקים (GET)
+        async function loadVendors() {
+            try {
+                const response = await fetch(`${API_URL}/vendors`); // שליחת בקשה לשרת
+                const vendors = await response.json(); // המרת התשובה ל-JSON
+                
+                const html = vendors.map(v => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                            <p class="font-semibold text-slate-800">${v.name}</p>
+                            <p class="text-xs text-slate-500">${v.category} • ₪${v.amount.toLocaleString()}</p>
+                        </div>
+                        <button onclick="deleteVendor('${v.id}')" class="text-red-500">🗑️</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('my-vendors-list').innerHTML = html || '<p class="text-center text-slate-400 py-4">אין ספקים עדיין</p>';
+            } catch (error) {
+                console.error('Error loading vendors:', error);
+                // אופציונלי: לא להציג שגיאה בפעם הראשונה כשהאתר עולה
+                // showToast('שגיאה בטעינת ספקים', '❌');
+            }
+        }
+
+        function addVendor() {
+            showModal('הוסף ספק חדש', `
+                <div class="space-y-3">
+                    <select id="vendor-category" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                        <option value="">בחר קטגוריה...</option>
+                        <option value="אולם">🏛️ אולם</option>
+                        <option value="צילום">📸 צילום</option>
+                        <option value="DJ">🎵 DJ</option>
+                        <option value="פרחים">💐 פרחים</option>
+                    </select>
+                    <input type="text" id="vendor-name" placeholder="שם הספק" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <input type="number" id="vendor-amount" placeholder="₪ סכום" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <button onclick="saveVendor()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף ספק</button>
+                </div>
+            `);
+        }
+
+        // שמירת ספק (POST)
+        async function saveVendor() {
+            const category = document.getElementById('vendor-category').value;
+            const name = document.getElementById('vendor-name').value;
+            const amount = document.getElementById('vendor-amount').value;
+
+            if (!category || !name || !amount) {
+                showToast('נא למלא את כל השדות', '⚠️');
+                return;
+            }
+
+            const newVendor = {
+                name: name,
+                category: category,
+                amount: Number(amount)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/vendors`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newVendor)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    showToast('הספק נשמר בהצלחה!', '🎉');
+                    loadVendors(); // רענון הרשימה מהשרת
+                } else {
+                    showToast('שגיאה בשמירה', '❌');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('שגיאת תקשורת', '❌');
+            }
+        }
+
+        // --- לוגיקת משימות (Tasks) מול השרת ---
+
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_URL}/tasks`);
+                const tasks = await response.json();
+                
+                const html = tasks.map(task => `
+                    <div class="card p-4 flex items-start gap-3">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTask('${task.id}', ${!task.completed})" 
+                               class="mt-1 w-5 h-5 accent-indigo-600">
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-800 ${task.completed ? 'line-through' : ''}">${task.title}</p>
+                            ${task.urgent ? '<p class="text-xs text-orange-600 mt-1">⚠️ דחוף!</p>' : ''}
+                        </div>
+                        <button onclick="deleteTask('${task.id}')" class="text-red-500">🗑️</button>
+                    </div>
+                `).join('');
+                
+                const tasksContainer = document.getElementById('tasks-list');
+                if(tasksContainer) tasksContainer.innerHTML = html;
+                
+                // עדכון גם במסך הבית
+                const homeTasks = document.getElementById('today-tasks-list');
+                if(homeTasks) homeTasks.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        function addTask() {
+            showModal('הוסף משימה חדשה', `
+                <div class="space-y-3">
+                    <input type="text" id="task-title" placeholder="כותרת המשימה" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" id="task-urgent" class="w-5 h-5 accent-indigo-600">
+                        <span class="text-sm">סמן כדחוף</span>
+                    </label>
+                    <button onclick="saveTask()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף משימה</button>
+                </div>
+            `);
+        }
+
+        async function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const urgent = document.getElementById('task-urgent').checked;
+
+            if (!title) return showToast('חסרה כותרת', '⚠️');
+
+            try {
+                const response = await fetch(`${API_URL}/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, urgent, completed: false })
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    showToast('המשימה נוספה!', '✅');
+                    loadTasks();
+                }
+            } catch (error) {
+                showToast('שגיאה בשמירה', '❌');
+            }
+        }
+
+        // --- פונקציות לתקציב ופרופיל (עדיין לוקליות בינתיים) ---
+        // (השארתי את הקודים האלו עובדים מקומית כדי שהאפליקציה תרגיש מלאה)
 
         function editNames() {
             showModal('ערוך שמות', `
@@ -421,7 +567,6 @@
         }
 
         function saveDate() {
-            const date = document.getElementById('edit-date').value;
             closeModal();
             showToast('התאריך עודכן!');
         }
@@ -436,192 +581,50 @@
         }
 
         function saveBudget() {
-            const amount = document.getElementById('edit-budget').value;
             closeModal();
             showToast('התקציב עודכן!');
         }
-
+        
         async function loadCategories() {
+             // Mock Data בינתיים לקטגוריות
             const categories = [
                 { id: '1', name: 'אולם ואירוח', icon: '🏛️', planned: 90000, actual: 85000 },
                 { id: '2', name: 'צילום ווידאו', icon: '📸', planned: 15000, actual: 16500 },
-                { id: '3', name: 'מוזיקה ובידור', icon: '🎵', planned: 12000, actual: 0 }
             ];
             
-            const html = categories.map(cat => {
-                const percentage = Math.round((cat.actual / cat.planned) * 100);
-                const diff = cat.actual - cat.planned;
-                const diffText = diff > 0 ? `+₪${diff.toLocaleString()}` : diff < 0 ? `-₪${Math.abs(diff).toLocaleString()}` : 'מאוזן';
-                const diffColor = diff > 0 ? 'text-orange-500' : 'text-green-600';
-                
-                return `
-                    <div class="card p-5">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <span class="text-3xl">${cat.icon}</span>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">${cat.name}</h4>
-                                    <p class="text-sm text-slate-500">₪${cat.actual.toLocaleString()} מתוך ₪${cat.planned.toLocaleString()}</p>
-                                </div>
+            const html = categories.map(cat => `
+                <div class="card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">${cat.icon}</span>
+                            <div>
+                                <h4 class="font-bold text-slate-800">${cat.name}</h4>
+                                <p class="text-sm text-slate-500">₪${cat.actual.toLocaleString()} מתוך ₪${cat.planned.toLocaleString()}</p>
                             </div>
-                            <div class="text-left">
-                                <p class="text-sm font-bold ${diffColor}">${diffText}</p>
-                                <p class="text-xs text-slate-400">${percentage}%</p>
-                            </div>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full ${diff > 0 ? 'bg-orange-500' : 'bg-green-500'}" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                        <div class="flex gap-2 mt-3">
-                            <button onclick="editCategory('${cat.id}')" class="flex-1 text-sm text-indigo-600 font-semibold">✏️ ערוך</button>
-                            <button onclick="addVendorToCategory('${cat.id}')" class="flex-1 text-sm text-green-600 font-semibold">+ ספק</button>
                         </div>
                     </div>
-                `;
-            }).join('');
-            
+                </div>
+            `).join('');
             document.getElementById('categories-list').innerHTML = html;
         }
 
         function addCategory() {
-            showModal('הוסף קטגוריה חדשה', `
-                <div class="space-y-3">
-                    <input type="text" id="cat-name" placeholder="שם הקטגוריה" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <input type="text" id="cat-icon" placeholder="אימוג'י (🎵)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <input type="number" id="cat-amount" placeholder="₪ תקציב מתוכנן" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <button onclick="saveCategory()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף</button>
-                </div>
-            `);
-        }
-
-        function saveCategory() {
-            closeModal();
-            showToast('הקטגוריה נוספה!', '🎉');
-            loadCategories();
-        }
-
-        function editCategory(id) {
-            showToast('עריכת קטגוריה - בקרוב!', 'ℹ️');
-        }
-
-        function addVendorToCategory(id) {
-            addVendor();
-        }
-
-        async function loadTasks() {
-            const tasks = [
-                { id: '1', title: 'לשלם מקדמה לצלם', urgent: true, completed: false },
-                { id: '2', title: 'לבחור DJ', urgent: false, completed: false },
-                { id: '3', title: 'להדפיס הזמנות', urgent: true, completed: false }
-            ];
-            
-            const html = tasks.map(task => `
-                <div class="card p-4 flex items-start gap-3">
-                    <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                           onchange="toggleTask('${task.id}')" 
-                           class="mt-1 w-5 h-5 accent-indigo-600">
-                    <div class="flex-1">
-                        <p class="font-semibold text-slate-800 ${task.completed ? 'line-through' : ''}">${task.title}</p>
-                        ${task.urgent ? '<p class="text-xs text-orange-600 mt-1">⚠️ דחוף!</p>' : ''}
-                    </div>
-                    <button onclick="deleteTask('${task.id}')" class="text-red-500">🗑️</button>
-                </div>
-            `).join('');
-            
-            document.getElementById('tasks-list').innerHTML = html;
-            
-            const todayHtml = html.substring(0, 400) + '...';
-            document.getElementById('today-tasks-list').innerHTML = html;
-        }
-
-        function addTask() {
-            showModal('הוסף משימה חדשה', `
-                <div class="space-y-3">
-                    <input type="text" id="task-title" placeholder="כותרת המשימה" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <textarea id="task-desc" placeholder="תיאור (אופציונלי)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none" rows="3"></textarea>
-                    <input type="date" id="task-date" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="task-urgent" class="w-5 h-5 accent-indigo-600">
-                        <span class="text-sm">סמן כדחוף</span>
-                    </label>
-                    <button onclick="saveTask()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף משימה</button>
-                </div>
-            `);
-        }
-
-        function saveTask() {
-            closeModal();
-            showToast('המשימה נוספה!', '✅');
-            loadTasks();
-        }
-
-        function toggleTask(taskId) {
-            showToast('המשימה עודכנה!');
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('למחוק משימה זו?')) {
-                showToast('המשימה נמחקה', '🗑️');
-                loadTasks();
-            }
-        }
-
-        async function loadVendors() {
-            const vendors = [
-                { id: '1', name: 'אקוודור אירועים', category: 'אולם', amount: 85000 },
-                { id: '2', name: 'לייט סטודיו', category: 'צילום', amount: 16500 }
-            ];
-            
-            const html = vendors.map(v => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <div>
-                        <p class="font-semibold text-slate-800">${v.name}</p>
-                        <p class="text-xs text-slate-500">${v.category} • ₪${v.amount.toLocaleString()}</p>
-                    </div>
-                    <button onclick="editVendor('${v.id}')" class="text-indigo-600">✏️</button>
-                </div>
-            `).join('');
-            
-            document.getElementById('my-vendors-list').innerHTML = html || '<p class="text-center text-slate-400 py-4">אין ספקים עדיין</p>';
-        }
-
-        function addVendor() {
-            showModal('הוסף ספק חדש', `
-                <div class="space-y-3">
-                    <select id="vendor-category" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                        <option>בחר קטגוריה...</option>
-                        <option>🏛️ אולם</option>
-                        <option>📸 צילום</option>
-                        <option>🎵 DJ</option>
-                        <option>💐 פרחים</option>
-                    </select>
-                    <input type="text" id="vendor-name" placeholder="שם הספק" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <input type="number" id="vendor-amount" placeholder="₪ סכום" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
-                    <button onclick="saveVendor()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף ספק</button>
-                </div>
-            `);
-        }
-
-        function saveVendor() {
-            closeModal();
-            showToast('הספק נוסף!', '🎉');
-            loadVendors();
-        }
-
-        function editVendor(id) {
-            showToast('עריכת ספק - בקרוב!', 'ℹ️');
+             showModal('הוסף קטגוריה', '<p class="text-center">בקרוב...</p>');
         }
 
         function saveWeddingDetails() {
             showToast('הפרטים נשמרו!', '✅');
         }
 
+        // --- אתחול ראשוני ---
         document.addEventListener('DOMContentLoaded', function() {
-            loadCategories();
-            loadTasks();
+            // טעינת נתונים ראשונית מהשרת
             loadVendors();
+            loadTasks();
+            loadCategories(); // כרגע Mock
             setTimeout(() => showToast('ברוכים הבאים! 💕', '🎉'), 500);
         });
+
     </script>
 
 </body>
