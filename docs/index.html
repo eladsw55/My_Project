@@ -124,8 +124,8 @@
 
             <!-- Budget Summary Cards -->
             <div class="grid grid-cols-3 gap-3 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow-card border border-slate-100">
-                    <p class="text-xs text-slate-500 mb-1">תקציב כולל</p>
+                <div class="bg-white p-4 rounded-2xl shadow-card border border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors" onclick="editTotalBudget()">
+                    <p class="text-xs text-slate-500 mb-1">תקציב כולל <i class="fa-solid fa-pen text-[10px] opacity-50 mr-1"></i></p>
                     <p class="font-bold text-slate-800 text-lg" id="totalBudgetDisplay">₪0</p>
                 </div>
                 <div class="bg-white p-4 rounded-2xl shadow-card border border-slate-100">
@@ -236,6 +236,10 @@
                     <label class="block text-sm font-medium text-slate-600 mb-1">תאריך החתונה</label>
                     <input type="date" id="weddingDateInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">תקציב כולל (יעד)</label>
+                    <input type="number" id="totalBudgetInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                </div>
             </div>
 
             <div class="mt-8 flex gap-3">
@@ -255,6 +259,7 @@
         const DB_KEY = 'wedding_elite_v3_data';
         
         const defaultData = {
+            totalBudget: 125000,
             couple: {
                 groom: "יוסי",
                 bride: "חן",
@@ -290,6 +295,9 @@
             const saved = localStorage.getItem(DB_KEY);
             if (saved) {
                 appData = JSON.parse(saved);
+                if (typeof appData.totalBudget === 'undefined') {
+                    appData.totalBudget = 125000;
+                }
             } else {
                 saveData(); // Save defaults
             }
@@ -368,9 +376,9 @@
             });
 
             // Update Summary Cards
-            document.getElementById('totalBudgetDisplay').textContent = `₪${totalPlanned.toLocaleString()}`;
+            document.getElementById('totalBudgetDisplay').textContent = `₪${Number(appData.totalBudget).toLocaleString()}`;
             document.getElementById('totalPaidDisplay').textContent = `₪${totalActual.toLocaleString()}`;
-            document.getElementById('totalRemainingDisplay').textContent = `₪${(totalPlanned - totalActual).toLocaleString()}`;
+            document.getElementById('totalRemainingDisplay').textContent = `₪${(appData.totalBudget - totalActual).toLocaleString()}`;
         }
 
         function openBudgetModal() {
@@ -434,6 +442,15 @@
             // OR we can save debounced. For simplicity, we save on close or here.
             // Let's save immediately for "Instant" requirement.
             saveData(); 
+        }
+
+        function editTotalBudget() {
+            const current = appData.totalBudget;
+            const input = prompt("הכנס תקציב כולל חדש:", current);
+            if (input !== null && !isNaN(input) && input.trim() !== "") {
+                appData.totalBudget = Number(input);
+                saveData();
+            }
         }
 
         // ================= TASKS LOGIC =================
@@ -527,6 +544,7 @@
             document.getElementById('groomNameInput').value = appData.couple.groom;
             document.getElementById('brideNameInput').value = appData.couple.bride;
             document.getElementById('weddingDateInput').value = appData.couple.date;
+            document.getElementById('totalBudgetInput').value = appData.totalBudget;
             
             document.getElementById('settingsModal').classList.remove('hidden');
         }
@@ -539,6 +557,7 @@
             appData.couple.groom = document.getElementById('groomNameInput').value;
             appData.couple.bride = document.getElementById('brideNameInput').value;
             appData.couple.date = document.getElementById('weddingDateInput').value;
+            appData.totalBudget = Number(document.getElementById('totalBudgetInput').value);
             
             saveData();
             closeSettingsModal();
