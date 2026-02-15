@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Wedding Elite Premium - מערכת ניהול חתונות מתקדמת לתכנון החתונה המושלמת">
     <title>Wedding Elite Premium | מערכת ניהול חתונות מתקדמת</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -47,6 +48,7 @@
             color: var(--text-main);
             transition: background-color 1.5s ease;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
         }
         
         .glass {
@@ -55,6 +57,7 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px 0 rgba(76, 85, 120, 0.05);
+            transition: all 0.3s ease; /* Smooth hover effects */
         }
 
         .glass-nav {
@@ -89,6 +92,12 @@
         .accent-target {
             color: var(--accent-color);
         }
+
+        /* Accessibility Focus Styles */
+        *:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="pb-32 antialiased">
@@ -97,7 +106,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 glass">
         <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target">
+                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target" aria-hidden="true">
                     <i class="fa-solid fa-ring"></i>
                 </div>
                 <div>
@@ -105,23 +114,23 @@
                     <p class="text-[10px] text-dusk/60 uppercase">Premium</p>
                 </div>
             </div>
-            <button onclick="WeddingApp.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk">
+            <button onclick="WeddingApp.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors duration-200" aria-label="פתח הגדרות">
                 <i class="fa-solid fa-gear"></i>
             </button>
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto px-5 pt-24 space-y-8">
+    <main class="max-w-3xl mx-auto px-5 pt-24 space-y-8" role="main">
 
         <!-- DASHBOARD -->
-        <div id="view-home" class="view-section">
+        <div id="view-home" class="view-section" aria-labelledby="dashboard-heading">
             <section class="glass rounded-3xl p-8 shadow-lg text-center animate-slide-up">
                 <div class="flex justify-between items-start mb-6">
                     <div class="text-right">
-                        <h2 class="text-2xl font-bold text-dusk" id="coupleNames">...</h2>
+                        <h2 id="dashboard-heading" class="text-2xl font-bold text-dusk" id="coupleNames">...</h2>
                         <p class="text-sm text-dusk/60" id="weddingDateText">--/--/----</p>
                     </div>
-                    <div class="relative w-16 h-16">
+                    <div class="relative w-16 h-16" aria-label="אחוז התקדמות">
                         <svg class="w-full h-full radial-progress" viewBox="0 0 100 100">
                             <circle class="text-dusk/10 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
                             <circle id="progressCircle" class="accent-target stroke-current radial-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent"></circle>
@@ -132,7 +141,7 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-4 gap-2">
+                <div class="grid grid-cols-4 gap-2" role="timer" aria-label="ספירה לאחור לחתונה">
                     <div class="bg-white/40 rounded-2xl p-3">
                         <span class="block text-2xl font-bold text-dusk" id="timerDays">0</span>
                         <span class="text-[10px] text-dusk/60 uppercase">ימים</span>
@@ -153,43 +162,44 @@
             </section>
 
             <div class="grid grid-cols-2 gap-4 mt-6">
-                <div onclick="WeddingApp.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 flex flex-col items-center justify-center gap-2 h-32">
-                    <i class="fa-solid fa-scroll text-2xl text-dusk/80"></i>
+                <!-- UX Improvement: Added hover scale effect for better interactivity -->
+                <button onclick="WeddingApp.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 hover:scale-[1.02] transition-transform duration-200 flex flex-col items-center justify-center gap-2 h-32 w-full text-center" aria-label="מעבר לרבנות">
+                    <i class="fa-solid fa-scroll text-2xl text-dusk/80" aria-hidden="true"></i>
                     <span class="font-medium text-sm">הרבנות</span>
-                </div>
-                <div onclick="WeddingApp.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 flex flex-col items-center justify-center gap-2 h-32">
-                    <i class="fa-solid fa-store text-2xl text-dusk/80"></i>
+                </button>
+                <button onclick="WeddingApp.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 hover:scale-[1.02] transition-transform duration-200 flex flex-col items-center justify-center gap-2 h-32 w-full text-center" aria-label="מעבר לספקים">
+                    <i class="fa-solid fa-store text-2xl text-dusk/80" aria-hidden="true"></i>
                     <span class="font-medium text-sm">ספקים</span>
-                </div>
+                </button>
             </div>
         </div>
 
         <!-- BUDGET -->
-        <div id="view-budget" class="view-section hidden">
+        <div id="view-budget" class="view-section hidden" aria-labelledby="budget-heading">
             <section class="animate-slide-up">
-                <h3 class="text-xl font-bold text-dusk mb-4 px-2">מנוע תקציב חכם</h3>
+                <h3 id="budget-heading" class="text-xl font-bold text-dusk mb-4 px-2">מנוע תקציב חכם</h3>
                 
                 <div class="glass p-5 rounded-2xl mb-6 border-r-4 border-sage">
                     <h4 class="font-bold text-sm text-dusk mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-calculator text-sageDark"></i> צפי מתנות
+                        <i class="fa-solid fa-calculator text-sageDark" aria-hidden="true"></i> צפי מתנות
                     </h4>
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div>
-                            <label class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
-                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
+                            <label for="guestsFamily" class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
+                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                         <div>
-                            <label class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
-                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
+                            <label for="guestsFriends" class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
+                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                         <div>
-                            <label class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
-                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
+                            <label for="guestsWork" class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
+                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-dusk/10 flex justify-between items-center">
                         <span class="text-xs font-medium">צפי הכנסות:</span>
-                        <span class="text-lg font-bold text-sageDark" id="predictedIncome">₪0</span>
+                        <span class="text-lg font-bold text-sageDark" id="predictedIncome" aria-live="polite">₪0</span>
                     </div>
                 </div>
 
@@ -209,12 +219,12 @@
         </div>
 
         <!-- RABBINATE -->
-        <div id="view-rabbinate" class="view-section hidden">
+        <div id="view-rabbinate" class="view-section hidden" aria-labelledby="rabbinate-heading">
             <section class="animate-slide-up">
-                <h3 class="text-xl font-bold text-dusk mb-4 px-2">הליך ברבנות</h3>
+                <h3 id="rabbinate-heading" class="text-xl font-bold text-dusk mb-4 px-2">הליך ברבנות</h3>
                 <div class="glass p-4 rounded-2xl mb-4">
                     <p class="text-sm text-dusk/80">
-                        <i class="fa-solid fa-circle-info text-sageDark ml-1"></i>
+                        <i class="fa-solid fa-circle-info text-sageDark ml-1" aria-hidden="true"></i>
                         יש לפתוח תיק בין 45 יום ל-3 חודשים לפני החתונה.
                     </p>
                 </div>
@@ -223,22 +233,22 @@
         </div>
 
         <!-- VENDORS -->
-        <div id="view-vendors" class="view-section hidden">
+        <div id="view-vendors" class="view-section hidden" aria-labelledby="vendors-heading">
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
-                    <button onclick="WeddingApp.Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
+                    <h3 id="vendors-heading" class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
+                    <button onclick="WeddingApp.Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center hover:bg-sageDark transition-colors duration-200 shadow-sm" aria-label="הוסף ספק"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="vendorsList" class="grid grid-cols-1 gap-4"></div>
             </section>
         </div>
 
         <!-- NOTES -->
-        <div id="view-notes" class="view-section hidden">
+        <div id="view-notes" class="view-section hidden" aria-labelledby="notes-heading">
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 class="text-xl font-bold text-dusk">לוח השראה</h3>
-                    <button onclick="WeddingApp.Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
+                    <h3 id="notes-heading" class="text-xl font-bold text-dusk">לוח השראה</h3>
+                    <button onclick="WeddingApp.Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center hover:bg-sageDark transition-colors duration-200 shadow-sm" aria-label="הוסף פתק"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="notesGrid" class="grid grid-cols-2 gap-4"></div>
             </section>
@@ -247,61 +257,61 @@
     </main>
 
     <!-- Bottom Nav -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2">
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2" role="navigation" aria-label="תפריט ראשי">
         <div class="flex justify-around items-center h-16 max-w-3xl mx-auto px-2">
-            <button onclick="WeddingApp.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="home">
-                <i class="fa-solid fa-house text-xl"></i>
+            <button onclick="WeddingApp.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="home" aria-label="בית">
+                <i class="fa-solid fa-house text-xl" aria-hidden="true"></i>
                 <span class="text-[10px] font-medium">בית</span>
             </button>
-            <button onclick="WeddingApp.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="budget">
-                <i class="fa-solid fa-sack-dollar text-xl"></i>
+            <button onclick="WeddingApp.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="budget" aria-label="תקציב">
+                <i class="fa-solid fa-sack-dollar text-xl" aria-hidden="true"></i>
                 <span class="text-[10px] font-medium">תקציב</span>
             </button>
-            <button onclick="WeddingApp.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="rabbinate">
-                <i class="fa-solid fa-scroll text-xl"></i>
+            <button onclick="WeddingApp.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="rabbinate" aria-label="רבנות">
+                <i class="fa-solid fa-scroll text-xl" aria-hidden="true"></i>
                 <span class="text-[10px] font-medium">רבנות</span>
             </button>
-            <button onclick="WeddingApp.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="vendors">
-                <i class="fa-solid fa-store text-xl"></i>
+            <button onclick="WeddingApp.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="vendors" aria-label="ספקים">
+                <i class="fa-solid fa-store text-xl" aria-hidden="true"></i>
                 <span class="text-[10px] font-medium">ספקים</span>
             </button>
-            <button onclick="WeddingApp.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="notes">
-                <i class="fa-solid fa-note-sticky text-xl"></i>
+            <button onclick="WeddingApp.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="notes" aria-label="פתקים">
+                <i class="fa-solid fa-note-sticky text-xl" aria-hidden="true"></i>
                 <span class="text-[10px] font-medium">פתקים</span>
             </button>
         </div>
     </nav>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="WeddingApp.closeSettings()"></div>
         <div class="glass w-full max-w-md rounded-3xl relative z-10 p-6 animate-slide-up bg-ivory">
-            <h3 class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
+            <h3 id="settings-title" class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-dusk/70 mb-1">שם החתן</label>
-                    <input type="text" id="groomInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
+                    <label for="groomInput" class="block text-sm font-medium text-dusk/70 mb-1">שם החתן</label>
+                    <input type="text" id="groomInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-dusk/70 mb-1">שם הכלה</label>
-                    <input type="text" id="brideInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
+                    <label for="brideInput" class="block text-sm font-medium text-dusk/70 mb-1">שם הכלה</label>
+                    <input type="text" id="brideInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-dusk/70 mb-1">תאריך החתונה</label>
-                    <input type="date" id="dateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
+                    <label for="dateInput" class="block text-sm font-medium text-dusk/70 mb-1">תאריך החתונה</label>
+                    <input type="date" id="dateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל</label>
-                    <input type="number" id="budgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
+                    <label for="budgetInput" class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל</label>
+                    <input type="number" id="budgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
                 </div>
             </div>
 
             <div class="mt-8 flex gap-3">
-                <button onclick="WeddingApp.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl">
+                <button onclick="WeddingApp.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl hover:bg-sageDark transition-colors duration-200 shadow-sm">
                     שמור
                 </button>
-                <button onclick="WeddingApp.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium">
+                <button onclick="WeddingApp.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50 transition-colors duration-200">
                     ביטול
                 </button>
             </div>
@@ -435,7 +445,7 @@
                         const el = document.createElement('div');
                         el.className = 'glass p-3 rounded-xl flex items-center gap-3';
                         el.innerHTML = `
-                            <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk">
+                            <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk" aria-hidden="true">
                                 <i class="fa-solid ${cat.icon}"></i>
                             </div>
                             <div class="flex-1">
@@ -447,7 +457,7 @@
                                     <div class="bg-sage h-full accent-target" style="width: ${percent}%"></div>
                                 </div>
                             </div>
-                            <button onclick="WeddingApp.Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="WeddingApp.Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark transition-colors duration-200" aria-label="ערוך ${cat.name}"><i class="fa-solid fa-pen"></i></button>
                         `;
                         grid.appendChild(el);
                     });
@@ -475,7 +485,7 @@
                         const el = document.createElement('div');
                         el.className = `p-4 rounded-xl flex items-center gap-3 ${task.done ? 'bg-sage/20 border border-sage' : 'bg-white/40 border border-white'}`;
                         el.innerHTML = `
-                            <div onclick="WeddingApp.Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : 'border-dusk/20'}">
+                            <div onclick="WeddingApp.Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : 'border-dusk/20'}" role="checkbox" aria-checked="${task.done}" tabindex="0" aria-label="${task.text}">
                                 ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
                             </div>
                             <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
@@ -523,7 +533,7 @@
                                     ${v.contract ? 'חוזה' : 'אין חוזה'}
                                 </span>
                             </div>
-                            <button onclick="WeddingApp.Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="WeddingApp.Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400 transition-colors duration-200" aria-label="מחק ספק"><i class="fa-solid fa-trash"></i></button>
                         `;
                         list.appendChild(el);
                     });
@@ -562,7 +572,7 @@
                         el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
                         el.innerHTML = `
                             <p class="text-dusk text-sm">${note.text}</p>
-                            <button onclick="WeddingApp.Notes.delete(${idx})" class="self-end text-dusk/30"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="WeddingApp.Notes.delete(${idx})" class="self-end text-dusk/30 hover:text-dusk transition-colors duration-200" aria-label="מחק פתק"><i class="fa-solid fa-trash-can"></i></button>
                         `;
                         grid.appendChild(el);
                     });

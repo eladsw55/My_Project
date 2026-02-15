@@ -3,7 +3,7 @@ Wedding Elite V2.0 - Backend API (UPGRADED)
 FastAPI application with full CRUD + Auth + Real-time support
 """
 
-from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict
@@ -98,6 +98,7 @@ def get_db():
     """Context manager for database connections"""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign key constraints
     try:
         yield conn
     finally:
@@ -254,6 +255,15 @@ def init_database():
             )
         """)
         
+        # Create indexes for performance
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_weddings_user_id ON weddings(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_budget_wedding_id ON budget_categories(wedding_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_bookings_wedding_id ON vendor_bookings(wedding_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_tasks_wedding_id ON tasks(wedding_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reviews_vendor_id ON reviews(vendor_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_vendors_category ON vendors(category)")
+
         conn.commit()
         logger.info("✅ Database initialized successfully")
 
@@ -513,7 +523,7 @@ def get_default_tasks(wedding_date: date):
 
 # ==================== API ENDPOINTS ====================
 
-@app.get("/")
+@app.get("/", tags=["General"])
 def root():
     """API root - Quick health check"""
     return {
@@ -523,7 +533,7 @@ def root():
         "timestamp": datetime.now().isoformat()
     }
 
-@app.get("/health")
+@app.get("/health", tags=["General"])
 def health_check():
     """Detailed health check with database status"""
     try:
@@ -552,13 +562,13 @@ def health_check():
 
 # ==================== AUTH ENDPOINTS ====================
 
-@app.post("/auth/register")
+@app.post("/auth/register", status_code=status.HTTP_201_CREATED, tags=["Auth"])
 async def register(user: UserRegister):
     """Register new couple"""
     
     # Rate limiting
     if not rate_limiter.is_allowed(f"register_{user.email}"):
-        raise HTTPException(status_code=429, detail="Too many requests. Please try again later.")
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many requests. Please try again later.")
     
     try:
         with get_db() as conn:
@@ -567,7 +577,7 @@ async def register(user: UserRegister):
             # Check if email exists
             cursor.execute("SELECT id FROM users WHERE email = ?", (user.email,))
             if cursor.fetchone():
-                raise HTTPException(status_code=400, detail="Email already registered")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
             
             # Create user
             user_id = generate_id()
@@ -622,13 +632,13 @@ async def register(user: UserRegister):
         logger.error(f"Registration error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/auth/login")
+@app.post("/auth/login", tags=["Auth"])
 async def login(credentials: UserLogin):
     """Login existing user"""
     
     # Rate limiting
     if not rate_limiter.is_allowed(f"login_{credentials.email}"):
-        raise HTTPException(status_code=429, detail="Too many login attempts. Please wait.")
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many login attempts. Please wait.")
     
     try:
         with get_db() as conn:
@@ -639,18 +649,18 @@ async def login(credentials: UserLogin):
             user = cursor.fetchone()
             
             if not user:
-                raise HTTPException(status_code=401, detail="Invalid email or password")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
             
             # Verify password
             if not verify_password(credentials.password, user["password_hash"]):
-                raise HTTPException(status_code=401, detail="Invalid email or password")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
             
             # Find wedding
             cursor.execute("SELECT id FROM weddings WHERE user_id = ?", (user["id"],))
             wedding = cursor.fetchone()
             
             if not wedding:
-                raise HTTPException(status_code=404, detail="No wedding found for this user")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No wedding found for this user")
             
             # Create session
             session_token = create_session_token()
@@ -671,7 +681,7 @@ async def login(credentials: UserLogin):
 
 # ==================== WEDDINGS ====================
 
-@app.post("/weddings", response_model=WeddingResponse)
+@app.post("/weddings", response_model=WeddingResponse, status_code=status.HTTP_201_CREATED, tags=["Weddings"])
 def create_wedding(wedding: WeddingCreate):
     """Create a new wedding"""
     try:
@@ -722,7 +732,7 @@ def create_wedding(wedding: WeddingCreate):
         logger.error(f"Error creating wedding: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.get("/weddings/{wedding_id}", response_model=WeddingResponse)
+@app.get("/weddings/{wedding_id}", response_model=WeddingResponse, tags=["Weddings"])
 def get_wedding(wedding_id: str):
     """Get wedding details"""
     try:
@@ -732,7 +742,7 @@ def get_wedding(wedding_id: str):
             row = cursor.fetchone()
             
             if not row:
-                raise HTTPException(status_code=404, detail="Wedding not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wedding not found")
             
             wedding_date = datetime.strptime(row["wedding_date"], "%Y-%m-%d").date()
             
@@ -752,7 +762,7 @@ def get_wedding(wedding_id: str):
         logger.error(f"Error getting wedding: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.put("/weddings/{wedding_id}")
+@app.put("/weddings/{wedding_id}", tags=["Weddings"])
 def update_wedding(wedding_id: str, update: WeddingUpdate):
     """Update wedding details (EDITABLE)"""
     try:
@@ -791,7 +801,7 @@ def update_wedding(wedding_id: str, update: WeddingUpdate):
                 conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Wedding not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wedding not found")
         
         logger.info(f"Wedding updated: {wedding_id}")
         return {"message": "Wedding updated successfully"}
@@ -801,7 +811,7 @@ def update_wedding(wedding_id: str, update: WeddingUpdate):
         logger.error(f"Error updating wedding: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.delete("/weddings/{wedding_id}")
+@app.delete("/weddings/{wedding_id}", tags=["Weddings"])
 def delete_wedding(wedding_id: str):
     """Delete wedding"""
     try:
@@ -811,7 +821,7 @@ def delete_wedding(wedding_id: str):
             conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Wedding not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wedding not found")
         
         logger.info(f"Wedding deleted: {wedding_id}")
         return {"message": "Wedding deleted successfully"}
@@ -823,7 +833,7 @@ def delete_wedding(wedding_id: str):
 
 # ==================== DASHBOARD ====================
 
-@app.get("/weddings/{wedding_id}/dashboard", response_model=DashboardResponse)
+@app.get("/weddings/{wedding_id}/dashboard", response_model=DashboardResponse, tags=["Dashboard"])
 def get_dashboard(wedding_id: str):
     """Get dashboard data with improved error handling"""
     try:
@@ -834,7 +844,7 @@ def get_dashboard(wedding_id: str):
             cursor.execute("SELECT * FROM weddings WHERE id = ?", (wedding_id,))
             wedding = cursor.fetchone()
             if not wedding:
-                raise HTTPException(status_code=404, detail="Wedding not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wedding not found")
             
             wedding_date = datetime.strptime(wedding["wedding_date"], "%Y-%m-%d").date()
             days_remaining = calculate_days_remaining(wedding_date)
@@ -887,7 +897,7 @@ def get_dashboard(wedding_id: str):
 
 # ==================== BUDGET ====================
 
-@app.get("/weddings/{wedding_id}/budget")
+@app.get("/weddings/{wedding_id}/budget", tags=["Budget"])
 def get_budget_categories(wedding_id: str):
     """Get all budget categories with improved error handling"""
     try:
@@ -897,7 +907,7 @@ def get_budget_categories(wedding_id: str):
             # Verify wedding exists
             cursor.execute("SELECT id FROM weddings WHERE id = ?", (wedding_id,))
             if not cursor.fetchone():
-                raise HTTPException(status_code=404, detail="Wedding not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wedding not found")
             
             cursor.execute("""
                 SELECT * FROM budget_categories 
@@ -926,7 +936,7 @@ def get_budget_categories(wedding_id: str):
         logger.error(f"Error loading budget: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/weddings/{wedding_id}/budget")
+@app.post("/weddings/{wedding_id}/budget", status_code=status.HTTP_201_CREATED, tags=["Budget"])
 def create_budget_category(wedding_id: str, category: BudgetCategoryCreate):
     """Add a new budget category"""
     try:
@@ -946,7 +956,7 @@ def create_budget_category(wedding_id: str, category: BudgetCategoryCreate):
         logger.error(f"Error creating category: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.put("/budget/{category_id}")
+@app.put("/budget/{category_id}", tags=["Budget"])
 def update_budget_category(category_id: str, update: BudgetCategoryUpdate):
     """Update budget category (EDITABLE)"""
     try:
@@ -977,7 +987,7 @@ def update_budget_category(category_id: str, update: BudgetCategoryUpdate):
                 conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Category not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
         
         logger.info(f"Budget category updated: {category_id}")
         return {"message": "Category updated"}
@@ -987,7 +997,7 @@ def update_budget_category(category_id: str, update: BudgetCategoryUpdate):
         logger.error(f"Error updating category: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.delete("/budget/{category_id}")
+@app.delete("/budget/{category_id}", tags=["Budget"])
 def delete_budget_category(category_id: str):
     """Delete budget category"""
     try:
@@ -997,7 +1007,7 @@ def delete_budget_category(category_id: str):
             conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Category not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
         
         logger.info(f"Budget category deleted: {category_id}")
         return {"message": "Category deleted"}
@@ -1009,7 +1019,7 @@ def delete_budget_category(category_id: str):
 
 # ==================== VENDOR BOOKINGS ====================
 
-@app.get("/weddings/{wedding_id}/bookings")
+@app.get("/weddings/{wedding_id}/bookings", tags=["Bookings"])
 def get_vendor_bookings(wedding_id: str):
     """Get couple's vendor bookings"""
     try:
@@ -1041,7 +1051,7 @@ def get_vendor_bookings(wedding_id: str):
         logger.error(f"Error loading bookings: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/weddings/{wedding_id}/bookings")
+@app.post("/weddings/{wedding_id}/bookings", status_code=status.HTTP_201_CREATED, tags=["Bookings"])
 def create_vendor_booking(wedding_id: str, booking: VendorBookingCreate):
     """Book a vendor"""
     try:
@@ -1074,7 +1084,7 @@ def create_vendor_booking(wedding_id: str, booking: VendorBookingCreate):
         logger.error(f"Error creating booking: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.put("/bookings/{booking_id}")
+@app.put("/bookings/{booking_id}", tags=["Bookings"])
 def update_vendor_booking(booking_id: str, update: VendorBookingUpdate):
     """Update vendor booking (EDITABLE)"""
     try:
@@ -1085,7 +1095,7 @@ def update_vendor_booking(booking_id: str, update: VendorBookingUpdate):
             cursor.execute("SELECT amount, category_id FROM vendor_bookings WHERE id = ?", (booking_id,))
             old_booking = cursor.fetchone()
             if not old_booking:
-                raise HTTPException(status_code=404, detail="Booking not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
             
             old_amount = old_booking["amount"]
             category_id = old_booking["category_id"]
@@ -1139,7 +1149,7 @@ def update_vendor_booking(booking_id: str, update: VendorBookingUpdate):
         logger.error(f"Error updating booking: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.delete("/bookings/{booking_id}")
+@app.delete("/bookings/{booking_id}", tags=["Bookings"])
 def delete_vendor_booking(booking_id: str):
     """Delete vendor booking"""
     try:
@@ -1150,7 +1160,7 @@ def delete_vendor_booking(booking_id: str):
             cursor.execute("SELECT amount, category_id FROM vendor_bookings WHERE id = ?", (booking_id,))
             booking = cursor.fetchone()
             if not booking:
-                raise HTTPException(status_code=404, detail="Booking not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
             
             # Delete booking
             cursor.execute("DELETE FROM vendor_bookings WHERE id = ?", (booking_id,))
@@ -1174,7 +1184,7 @@ def delete_vendor_booking(booking_id: str):
 
 # ==================== TASKS ====================
 
-@app.get("/weddings/{wedding_id}/tasks")
+@app.get("/weddings/{wedding_id}/tasks", tags=["Tasks"])
 def get_tasks(wedding_id: str, timeline_period: Optional[str] = None):
     """Get all tasks"""
     try:
@@ -1212,7 +1222,7 @@ def get_tasks(wedding_id: str, timeline_period: Optional[str] = None):
         logger.error(f"Error loading tasks: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/weddings/{wedding_id}/tasks")
+@app.post("/weddings/{wedding_id}/tasks", status_code=status.HTTP_201_CREATED, tags=["Tasks"])
 def create_task(wedding_id: str, task: TaskCreate):
     """Create a new task"""
     try:
@@ -1233,7 +1243,7 @@ def create_task(wedding_id: str, task: TaskCreate):
         logger.error(f"Error creating task: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.put("/tasks/{task_id}")
+@app.put("/tasks/{task_id}", tags=["Tasks"])
 def update_task(task_id: str, update: TaskUpdate):
     """Update task (EDITABLE)"""
     try:
@@ -1264,7 +1274,7 @@ def update_task(task_id: str, update: TaskUpdate):
                 conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Task not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         
         logger.info(f"Task updated: {task_id}")
         return {"message": "Task updated"}
@@ -1274,7 +1284,7 @@ def update_task(task_id: str, update: TaskUpdate):
         logger.error(f"Error updating task: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.patch("/tasks/{task_id}/complete")
+@app.patch("/tasks/{task_id}/complete", tags=["Tasks"])
 def toggle_task_completion(task_id: str):
     """Toggle task completion"""
     try:
@@ -1285,7 +1295,7 @@ def toggle_task_completion(task_id: str):
             cursor.execute("SELECT is_completed FROM tasks WHERE id = ?", (task_id,))
             task = cursor.fetchone()
             if not task:
-                raise HTTPException(status_code=404, detail="Task not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
             
             new_state = not bool(task["is_completed"])
             completed_at = "CURRENT_TIMESTAMP" if new_state else "NULL"
@@ -1305,7 +1315,7 @@ def toggle_task_completion(task_id: str):
         logger.error(f"Error toggling task: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.delete("/tasks/{task_id}")
+@app.delete("/tasks/{task_id}", tags=["Tasks"])
 def delete_task(task_id: str):
     """Delete task"""
     try:
@@ -1315,7 +1325,7 @@ def delete_task(task_id: str):
             conn.commit()
             
             if cursor.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Task not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         
         logger.info(f"Task deleted: {task_id}")
         return {"message": "Task deleted"}
@@ -1327,7 +1337,7 @@ def delete_task(task_id: str):
 
 # ==================== VENDORS MARKETPLACE ====================
 
-@app.get("/vendors")
+@app.get("/vendors", tags=["Marketplace"])
 def search_vendors(category: Optional[str] = None, location: Optional[str] = None):
     """Search vendors in marketplace"""
     try:
@@ -1370,7 +1380,7 @@ def search_vendors(category: Optional[str] = None, location: Optional[str] = Non
         logger.error(f"Error searching vendors: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.get("/vendors/{vendor_id}")
+@app.get("/vendors/{vendor_id}", tags=["Marketplace"])
 def get_vendor_profile(vendor_id: str):
     """Get vendor profile"""
     try:
@@ -1380,7 +1390,7 @@ def get_vendor_profile(vendor_id: str):
             row = cursor.fetchone()
             
             if not row:
-                raise HTTPException(status_code=404, detail="Vendor not found")
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
             
             return {
                 "id": row["id"],
@@ -1404,7 +1414,7 @@ def get_vendor_profile(vendor_id: str):
         logger.error(f"Error getting vendor: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/vendors")
+@app.post("/vendors", status_code=status.HTTP_201_CREATED, tags=["Marketplace"])
 def create_vendor(vendor: VendorCreate):
     """Create vendor profile (for vendors)"""
     try:
@@ -1456,7 +1466,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.websocket("/ws/wedding/{wedding_id}")
+@app.websocket("/ws/wedding/{wedding_id}") # WebSocket does not support tags in the same way
 async def websocket_endpoint(websocket: WebSocket, wedding_id: str):
     """WebSocket for real-time updates"""
     await manager.connect(websocket, wedding_id)
