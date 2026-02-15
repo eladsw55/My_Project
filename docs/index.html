@@ -3,650 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Wedding Elite Premium - מערכת ניהול חתונות מתקדמת לתכנון החתונה המושלמת">
-    <title>Wedding Elite Premium | מערכת ניהול חתונות מתקדמת</title>
+    <title>Wedding Planner Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Heebo', 'sans-serif'] },
-                    colors: {
-                        ivory: '#F5F5DC',
-                        sage: '#D0E6D2',
-                        sageDark: '#8FBC94',
-                        dusk: '#4C5578',
-                        gold: '#D4AF37',
-                        warm: '#F0E6D2',
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
         :root {
-            --bg-color: #F5F5DC;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-main: #4C5578;
-            --accent-color: #8FBC94;
+            --primary-dark: #0f172a; /* Deep Royal Blue */
+            --accent-gold: #d4af37; /* Metallic Gold */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --font-main: 'Assistant', sans-serif;
+            --font-heading: 'Playfair Display', serif;
         }
 
-        body.theme-warm {
-            --bg-color: #F0E6D2;
-            --accent-color: #D4AF37;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            transition: background-color 1.5s ease;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+            background-color: var(--primary-dark);
+            background-image: radial-gradient(circle at top right, #1e293b, var(--primary-dark));
+            color: var(--text-light);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            padding-bottom: 80px; /* Space for bottom nav */
         }
-        
-        .glass {
+
+        /* --- Glassmorphism Utilities --- */
+        .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(76, 85, 120, 0.05);
-            transition: all 0.3s ease; /* Smooth hover effects */
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .radial-progress {
-            transform: rotate(-90deg);
-        }
-        .radial-circle {
-            stroke-dasharray: 283;
-            stroke-dashoffset: 283;
-            transition: stroke-dashoffset 1s ease-in-out;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
-        
-        .note-card {
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
         }
-        .note-card:hover {
-            transform: scale(1.02) rotate(1deg);
-            z-index: 10;
+        
+        .glass-card:active { transform: scale(0.98); }
+
+        h1, h2, h3 { font-family: var(--font-heading); color: var(--accent-gold); letter-spacing: 0.5px; }
+
+        /* --- Header --- */
+        header {
+            padding: 30px 20px 10px;
+            text-align: center;
+        }
+        .couple-names { font-size: 1.8rem; margin-bottom: 5px; }
+        .countdown { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* --- Dashboard Stats --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+        }
+        .stat-value { font-size: 1.5rem; font-weight: 800; display: block; margin-top: 5px; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), #fde68a);
+            width: 0%;
+            transition: width 0.5s ease;
         }
 
-        .accent-target {
-            color: var(--accent-color);
+        /* --- Lists (Guests/Expenses) --- */
+        .list-container { padding: 0 20px; }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .item-details h4 { color: var(--text-light); margin-bottom: 3px; }
+        .item-details p { font-size: 0.85rem; color: var(--text-muted); }
+        .item-actions button {
+            background: none; border: none; color: var(--text-muted);
+            margin-right: 10px; font-size: 1.1rem; cursor: pointer;
         }
 
-        /* Accessibility Focus Styles */
-        *:focus-visible {
-            outline: 2px solid var(--accent-color);
-            outline-offset: 2px;
+        /* --- Floating Action Button --- */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: none;
+            z-index: 100;
+        }
+
+        /* --- Bottom Nav --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid var(--glass-border);
+            z-index: 99;
+        }
+        .nav-item {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 0.8rem;
+            background: none; border: none;
+        }
+        .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--accent-gold); }
+
+        /* --- Inputs & Forms --- */
+        .app-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-family: var(--font-main);
+        }
+        
+        /* Sections Visibility */
+        .app-section { display: none; animation: fadeIn 0.3s ease; }
+        .app-section.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 200;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #1e293b; width: 90%; max-width: 400px;
+            padding: 25px; border-radius: 20px; border: 1px solid var(--accent-gold);
+        }
+        .btn-gold {
+            background: var(--accent-gold); color: var(--primary-dark);
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            font-weight: bold; font-size: 1rem; margin-top: 10px;
         }
     </style>
 </head>
-<body class="pb-32 antialiased">
+<body>
 
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-40 glass">
-        <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target" aria-hidden="true">
-                    <i class="fa-solid fa-ring"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg text-dusk">WEDDING ELITE</h1>
-                    <p class="text-[10px] text-dusk/60 uppercase">Premium</p>
-                </div>
-            </div>
-            <button onclick="WeddingApp.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors duration-200" aria-label="פתח הגדרות">
-                <i class="fa-solid fa-gear"></i>
-            </button>
-        </div>
+    <header>
+        <h1 class="couple-names">החתונה של <span id="namesDisplay">...</span></h1>
+        <p class="countdown" id="dateDisplay">טוען נתונים...</p>
     </header>
 
-    <main class="max-w-3xl mx-auto px-5 pt-24 space-y-8" role="main">
-
-        <!-- DASHBOARD -->
-        <div id="view-home" class="view-section" aria-labelledby="dashboard-heading">
-            <section class="glass rounded-3xl p-8 shadow-lg text-center animate-slide-up">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="text-right">
-                        <h2 id="dashboard-heading" class="text-2xl font-bold text-dusk" id="coupleNames">...</h2>
-                        <p class="text-sm text-dusk/60" id="weddingDateText">--/--/----</p>
-                    </div>
-                    <div class="relative w-16 h-16" aria-label="אחוז התקדמות">
-                        <svg class="w-full h-full radial-progress" viewBox="0 0 100 100">
-                            <circle class="text-dusk/10 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
-                            <circle id="progressCircle" class="accent-target stroke-current radial-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent"></circle>
-                        </svg>
-                        <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold text-dusk">
-                            <span id="progressPercent">0%</span>
-                        </div>
-                    </div>
+    <section id="dashboard" class="app-section active">
+        <div class="list-container">
+            <div class="glass-card">
+                <h3><i class="fas fa-wallet"></i> תקציב כולל</h3>
+                <div class="flex justify-between" style="display:flex; justify-content:space-between; align-items:end;">
+                    <span style="font-size: 2rem; font-weight: bold;" id="budgetLeft">₪0</span>
+                    <small style="color:var(--text-muted)">נותר</small>
                 </div>
-                
-                <div class="grid grid-cols-4 gap-2" role="timer" aria-label="ספירה לאחור לחתונה">
-                    <div class="bg-white/40 rounded-2xl p-3">
-                        <span class="block text-2xl font-bold text-dusk" id="timerDays">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase">ימים</span>
-                    </div>
-                    <div class="bg-white/40 rounded-2xl p-3">
-                        <span class="block text-2xl font-bold text-dusk" id="timerHours">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase">שעות</span>
-                    </div>
-                    <div class="bg-white/40 rounded-2xl p-3">
-                        <span class="block text-2xl font-bold text-dusk" id="timerMins">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase">דקות</span>
-                    </div>
-                    <div class="bg-white/40 rounded-2xl p-3">
-                        <span class="block text-2xl font-bold text-dusk" id="timerSecs">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase">שניות</span>
-                    </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="budgetProgress"></div>
                 </div>
-            </section>
-
-            <div class="grid grid-cols-2 gap-4 mt-6">
-                <!-- UX Improvement: Added hover scale effect for better interactivity -->
-                <button onclick="WeddingApp.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 hover:scale-[1.02] transition-transform duration-200 flex flex-col items-center justify-center gap-2 h-32 w-full text-center" aria-label="מעבר לרבנות">
-                    <i class="fa-solid fa-scroll text-2xl text-dusk/80" aria-hidden="true"></i>
-                    <span class="font-medium text-sm">הרבנות</span>
-                </button>
-                <button onclick="WeddingApp.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 hover:scale-[1.02] transition-transform duration-200 flex flex-col items-center justify-center gap-2 h-32 w-full text-center" aria-label="מעבר לספקים">
-                    <i class="fa-solid fa-store text-2xl text-dusk/80" aria-hidden="true"></i>
-                    <span class="font-medium text-sm">ספקים</span>
-                </button>
+                <p style="margin-top:10px; font-size:0.9rem;">
+                    הוצאנו <span id="budgetSpent">0</span> מתוך <span id="budgetTotal">0</span>
+                </p>
             </div>
-        </div>
 
-        <!-- BUDGET -->
-        <div id="view-budget" class="view-section hidden" aria-labelledby="budget-heading">
-            <section class="animate-slide-up">
-                <h3 id="budget-heading" class="text-xl font-bold text-dusk mb-4 px-2">מנוע תקציב חכם</h3>
-                
-                <div class="glass p-5 rounded-2xl mb-6 border-r-4 border-sage">
-                    <h4 class="font-bold text-sm text-dusk mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-calculator text-sageDark" aria-hidden="true"></i> צפי מתנות
-                    </h4>
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div>
-                            <label for="guestsFamily" class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
-                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
-                        </div>
-                        <div>
-                            <label for="guestsFriends" class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
-                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
-                        </div>
-                        <div>
-                            <label for="guestsWork" class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
-                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm focus:ring-2 focus:ring-sage outline-none transition-all" oninput="WeddingApp.Budget.calcGifts()">
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-dusk/10 flex justify-between items-center">
-                        <span class="text-xs font-medium">צפי הכנסות:</span>
-                        <span class="text-lg font-bold text-sageDark" id="predictedIncome" aria-live="polite">₪0</span>
-                    </div>
+            <div class="stats-grid">
+                <div class="glass-card stat-item">
+                    <i class="fas fa-users" style="color: #60a5fa;"></i>
+                    <span class="stat-value" id="totalGuests">0</span>
+                    <span class="stat-label">אורחים</span>
                 </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="glass p-4 rounded-2xl">
-                        <p class="text-xs text-dusk/60 mb-1">תקציב יעד</p>
-                        <p class="font-bold text-dusk text-xl" id="totalBudgetDisplay">₪0</p>
-                    </div>
-                    <div class="glass p-4 rounded-2xl">
-                        <p class="text-xs text-dusk/60 mb-1">נותר</p>
-                        <p class="font-bold text-sageDark text-xl" id="remainingDisplay">₪0</p>
-                    </div>
+                <div class="glass-card stat-item">
+                    <i class="fas fa-gift" style="color: #f472b6;"></i>
+                    <span class="stat-value" id="totalGifts">₪0</span>
+                    <span class="stat-label">מתנות</span>
                 </div>
-
-                <div id="budgetGrid" class="space-y-3"></div>
-            </section>
-        </div>
-
-        <!-- RABBINATE -->
-        <div id="view-rabbinate" class="view-section hidden" aria-labelledby="rabbinate-heading">
-            <section class="animate-slide-up">
-                <h3 id="rabbinate-heading" class="text-xl font-bold text-dusk mb-4 px-2">הליך ברבנות</h3>
-                <div class="glass p-4 rounded-2xl mb-4">
-                    <p class="text-sm text-dusk/80">
-                        <i class="fa-solid fa-circle-info text-sageDark ml-1" aria-hidden="true"></i>
-                        יש לפתוח תיק בין 45 יום ל-3 חודשים לפני החתונה.
-                    </p>
-                </div>
-                <div id="rabbinateList" class="space-y-3"></div>
-            </section>
-        </div>
-
-        <!-- VENDORS -->
-        <div id="view-vendors" class="view-section hidden" aria-labelledby="vendors-heading">
-            <section class="animate-slide-up">
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 id="vendors-heading" class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
-                    <button onclick="WeddingApp.Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center hover:bg-sageDark transition-colors duration-200 shadow-sm" aria-label="הוסף ספק"><i class="fa-solid fa-plus"></i></button>
-                </div>
-                <div id="vendorsList" class="grid grid-cols-1 gap-4"></div>
-            </section>
-        </div>
-
-        <!-- NOTES -->
-        <div id="view-notes" class="view-section hidden" aria-labelledby="notes-heading">
-            <section class="animate-slide-up">
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 id="notes-heading" class="text-xl font-bold text-dusk">לוח השראה</h3>
-                    <button onclick="WeddingApp.Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center hover:bg-sageDark transition-colors duration-200 shadow-sm" aria-label="הוסף פתק"><i class="fa-solid fa-plus"></i></button>
-                </div>
-                <div id="notesGrid" class="grid grid-cols-2 gap-4"></div>
-            </section>
-        </div>
-
-    </main>
-
-    <!-- Bottom Nav -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2" role="navigation" aria-label="תפריט ראשי">
-        <div class="flex justify-around items-center h-16 max-w-3xl mx-auto px-2">
-            <button onclick="WeddingApp.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="home" aria-label="בית">
-                <i class="fa-solid fa-house text-xl" aria-hidden="true"></i>
-                <span class="text-[10px] font-medium">בית</span>
-            </button>
-            <button onclick="WeddingApp.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="budget" aria-label="תקציב">
-                <i class="fa-solid fa-sack-dollar text-xl" aria-hidden="true"></i>
-                <span class="text-[10px] font-medium">תקציב</span>
-            </button>
-            <button onclick="WeddingApp.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="rabbinate" aria-label="רבנות">
-                <i class="fa-solid fa-scroll text-xl" aria-hidden="true"></i>
-                <span class="text-[10px] font-medium">רבנות</span>
-            </button>
-            <button onclick="WeddingApp.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="vendors" aria-label="ספקים">
-                <i class="fa-solid fa-store text-xl" aria-hidden="true"></i>
-                <span class="text-[10px] font-medium">ספקים</span>
-            </button>
-            <button onclick="WeddingApp.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14 transition-colors duration-200 hover:text-dusk/70" data-target="notes" aria-label="פתקים">
-                <i class="fa-solid fa-note-sticky text-xl" aria-hidden="true"></i>
-                <span class="text-[10px] font-medium">פתקים</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="WeddingApp.closeSettings()"></div>
-        <div class="glass w-full max-w-md rounded-3xl relative z-10 p-6 animate-slide-up bg-ivory">
-            <h3 id="settings-title" class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
+            </div>
             
-            <div class="space-y-4">
-                <div>
-                    <label for="groomInput" class="block text-sm font-medium text-dusk/70 mb-1">שם החתן</label>
-                    <input type="text" id="groomInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
-                </div>
-                <div>
-                    <label for="brideInput" class="block text-sm font-medium text-dusk/70 mb-1">שם הכלה</label>
-                    <input type="text" id="brideInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
-                </div>
-                <div>
-                    <label for="dateInput" class="block text-sm font-medium text-dusk/70 mb-1">תאריך החתונה</label>
-                    <input type="date" id="dateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
-                </div>
-                <div>
-                    <label for="budgetInput" class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל</label>
-                    <input type="number" id="budgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-sage outline-none transition-all">
-                </div>
+            <div class="glass-card" onclick="switchTab('settings')">
+                <h4 style="text-align: center; color: var(--accent-gold);">ניהול הגדרות חתונה <i class="fas fa-cog"></i></h4>
             </div>
+        </div>
+    </section>
 
-            <div class="mt-8 flex gap-3">
-                <button onclick="WeddingApp.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl hover:bg-sageDark transition-colors duration-200 shadow-sm">
-                    שמור
-                </button>
-                <button onclick="WeddingApp.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50 transition-colors duration-200">
-                    ביטול
-                </button>
-            </div>
+    <section id="expenses" class="app-section">
+        <div class="list-container">
+            <h2 style="margin-bottom: 20px;">ניהול ספקים והוצאות</h2>
+            <div id="expensesList"></div>
+        </div>
+        <button class="fab" onclick="openExpenseModal()"><i class="fas fa-plus"></i></button>
+    </section>
+
+    <section id="guests" class="app-section">
+        <div class="list-container">
+            <h2 style="margin-bottom: 20px;">רשימת מוזמנים</h2>
+            <input type="text" class="app-input" placeholder="חפש אורח..." onkeyup="filterGuests(this.value)">
+            <div id="guestsList"></div>
+        </div>
+        <button class="fab" onclick="openGuestModal()"><i class="fas fa-user-plus"></i></button>
+    </section>
+
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin-bottom: 15px;">הוספה</h3>
+            <div id="modalBody"></div>
+            <button class="btn-gold" id="modalActionBtn">שמור</button>
+            <button onclick="closeModal()" style="width:100%; margin-top:10px; background:none; border:none; color:white;">ביטול</button>
         </div>
     </div>
 
-    <script type="module">
-        const DB_KEY = 'wedding_elite_premium';
-
-        const initialState = {
-            totalBudget: 125000,
-            guests: { family: 0, friends: 0, work: 0 },
-            couple: {
-                groom: "יוסי",
-                bride: "חן",
-                date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
-            },
-            budget: [
-                { id: 'venue', name: "אולם ואירוח", icon: "fa-utensils", planned: 80000, actual: 0, paid: 0 },
-                { id: 'photo', name: "צילום", icon: "fa-camera", planned: 12000, actual: 0, paid: 0 },
-                { id: 'dj', name: "מוזיקה", icon: "fa-music", planned: 8000, actual: 0, paid: 0 },
-                { id: 'dress', name: "שמלה ואיפור", icon: "fa-shirt", planned: 10000, actual: 0, paid: 0 }
-            ],
-            rabbinate: [
-                { id: 1, text: "פתיחת תיק נישואין", done: false },
-                { id: 2, text: "הדרכת כלות", done: false },
-                { id: 3, text: "תעודות רווקות", done: false },
-                { id: 4, text: "אישור מקווה", done: false }
-            ],
-            vendors: [],
-            notes: []
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('dashboard')">
+            <i class="fas fa-home"></i> ראשי
+        </button>
+        <button class="nav-item" onclick="switchTab('expenses')">
+            <i class="fas fa-file-invoice-dollar"></i> תקציב
+        </button>
+        <button class="nav-item" onclick="switchTab('guests')">
+            <i class="fas fa-users"></i> אורחים
+        </button>
+    </nav>
+<script>
+        // --- State Management ---
+        const state = {
+            settings: {},
+            expenses: [],
+            guests: []
         };
 
-        const debounce = (func, wait) => {
-            let timeout;
-            return (...args) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), wait);
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            const res = await fetch('/api/dashboard');
+            const data = await res.json();
+            state.settings = data.settings;
+            
+            // Update UI
+            document.getElementById('namesDisplay').innerText = `${data.settings.groom_name} & ${data.settings.bride_name}`;
+            document.getElementById('dateDisplay').innerText = data.settings.wedding_date;
+            
+            document.getElementById('budgetTotal').innerText = `₪${data.settings.total_budget.toLocaleString()}`;
+            document.getElementById('budgetSpent').innerText = `₪${data.summary.total_spent.toLocaleString()}`;
+            document.getElementById('budgetLeft').innerText = `₪${(data.settings.total_budget - data.summary.total_spent).toLocaleString()}`;
+            document.getElementById('totalGuests').innerText = data.summary.total_guests;
+            document.getElementById('totalGifts').innerText = `₪${data.summary.total_gifts.toLocaleString()}`;
+
+            // Progress Bar
+            const percent = (data.summary.total_spent / data.settings.total_budget) * 100;
+            document.getElementById('budgetProgress').style.width = `${Math.min(percent, 100)}%`;
+            if(percent > 100) document.getElementById('budgetProgress').style.backgroundColor = 'red';
+        }
+
+        // --- Navigation ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.app-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            if(tabId === 'settings') {
+                 // Open settings modal logically
+                 openSettingsModal();
+                 return; 
+            }
+
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update Nav Active State (Simple logic)
+            const icons = {'dashboard': 0, 'expenses': 1, 'guests': 2};
+            document.querySelectorAll('.nav-item')[icons[tabId]].classList.add('active');
+
+            if(tabId === 'expenses') loadExpenses();
+            if(tabId === 'guests') loadGuests();
+        }
+
+        // --- Expenses Logic ---
+        async function loadExpenses() {
+            const res = await fetch('/api/expenses');
+            state.expenses = await res.json();
+            const container = document.getElementById('expensesList');
+            container.innerHTML = state.expenses.map(ex => `
+                <div class="glass-card list-item">
+                    <div class="item-details">
+                        <h4>${ex.title} <span style="font-size:0.7em; opacity:0.7">(${ex.category})</span></h4>
+                        <p>שולם: ₪${ex.paid_amount} / עלות: ₪${ex.estimated_cost}</p>
+                    </div>
+                    <div class="item-actions">
+                        <span style="color:var(--accent-gold); font-weight:bold;">₪${ex.estimated_cost}</span>
+                        <button onclick="deleteExpense(${ex.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openExpenseModal() {
+            document.getElementById('modalTitle').innerText = "הוסף הוצאה חדשה";
+            document.getElementById('modalBody').innerHTML = `
+                <input type="text" id="exTitle" class="app-input" placeholder="שם ההוצאה (למשל: צלם)">
+                <input type="text" id="exCat" class="app-input" placeholder="קטגוריה">
+                <input type="number" id="exCost" class="app-input" placeholder="עלות משוערת">
+                <input type="number" id="exPaid" class="app-input" placeholder="כמה שולם כבר?">
+            `;
+            document.getElementById('modalActionBtn').onclick = saveExpense;
+            document.getElementById('itemModal').style.display = 'flex';
+        }
+
+        async function saveExpense() {
+            const data = {
+                title: document.getElementById('exTitle').value,
+                category: document.getElementById('exCat').value,
+                estimated_cost: document.getElementById('exCost').value,
+                paid_amount: document.getElementById('exPaid').value || 0
             };
-        };
+            await fetch('/api/expenses', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            closeModal();
+            loadExpenses();
+        }
 
-        const saveToStorage = (state) => {
-            localStorage.setItem(DB_KEY, JSON.stringify(state));
-        };
-        
-        const debouncedSave = debounce(saveToStorage, 1000);
-
-        const handler = {
-            set(target, property, value) {
-                target[property] = value;
-                debouncedSave(state);
-                if (property === 'budget' || property === 'guests') WeddingApp.Budget.render();
-                if (property === 'rabbinate') WeddingApp.Rabbinate.render();
-                if (property === 'vendors') WeddingApp.Vendors.render();
-                if (property === 'notes') WeddingApp.Notes.render();
-                if (property === 'couple') WeddingApp.Dashboard.renderHero();
-                return true;
+        async function deleteExpense(id) {
+            if(confirm('למחוק הוצאה זו?')) {
+                await fetch(`/api/expenses?id=${id}`, { method: 'DELETE' });
+                loadExpenses();
             }
-        };
+        }
 
-        let loadedData = JSON.parse(localStorage.getItem(DB_KEY)) || initialState;
-        loadedData = { ...initialState, ...loadedData };
-        
-        const state = new Proxy(loadedData, handler);
+        // --- Guests Logic ---
+        async function loadGuests() {
+            const res = await fetch('/api/guests');
+            state.guests = await res.json();
+            renderGuests(state.guests);
+        }
 
-        const WeddingApp = {
-            Dashboard: {
-                renderHero() {
-                    document.getElementById('coupleNames').textContent = `${state.couple.groom} & ${state.couple.bride}`;
-                    document.getElementById('weddingDateText').textContent = new Date(state.couple.date).toLocaleDateString('he-IL');
-                },
+        function renderGuests(list) {
+            const container = document.getElementById('guestsList');
+            container.innerHTML = list.map(g => `
+                <div class="glass-card list-item">
+                    <div class="item-details">
+                        <h4>${g.name} <span style="font-size:0.8rem; background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px;">${g.total_people} אורחים</span></h4>
+                        <p>${g.side} | ${g.invite_status}</p>
+                    </div>
+                    <div class="item-actions">
+                         ${g.gift_amount > 0 ? `<span style="color:#10b981; margin-left:10px;">+₪${g.gift_amount}</span>` : ''}
+                        <button onclick="deleteGuest(${g.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-                startTimer() {
-                    const animate = () => {
-                        const now = new Date().getTime();
-                        const weddingDate = new Date(state.couple.date).getTime();
-                        const distance = weddingDate - now;
+        function filterGuests(query) {
+            const filtered = state.guests.filter(g => g.name.includes(query));
+            renderGuests(filtered);
+        }
 
-                        if (distance < 0) return;
+        function openGuestModal() {
+            document.getElementById('modalTitle').innerText = "הוסף אורח";
+            document.getElementById('modalBody').innerHTML = `
+                <input type="text" id="gName" class="app-input" placeholder="שם האורח">
+                <select id="gSide" class="app-input" style="background:#1e293b">
+                    <option value="חתן">צד חתן</option>
+                    <option value="כלה">צד כלה</option>
+                </select>
+                <input type="number" id="gCount" class="app-input" value="1" placeholder="כמות אנשים">
+                <select id="gStatus" class="app-input" style="background:#1e293b">
+                    <option value="טרם">טרם אישר</option>
+                    <option value="מגיע">מגיע</option>
+                    <option value="לא מגיע">לא מגיע</option>
+                </select>
+                <input type="number" id="gGift" class="app-input" placeholder="מתנה שהתקבלה (אופציונלי)">
+            `;
+            document.getElementById('modalActionBtn').onclick = saveGuest;
+            document.getElementById('itemModal').style.display = 'flex';
+        }
 
-                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        async function saveGuest() {
+            const data = {
+                name: document.getElementById('gName').value,
+                side: document.getElementById('gSide').value,
+                total_people: document.getElementById('gCount').value,
+                invite_status: document.getElementById('gStatus').value,
+                gift_amount: document.getElementById('gGift').value
+            };
+            await fetch('/api/guests', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            closeModal();
+            loadGuests();
+        }
 
-                        document.getElementById('timerDays').innerText = days;
-                        document.getElementById('timerHours').innerText = hours;
-                        document.getElementById('timerMins').innerText = minutes;
-                        document.getElementById('timerSecs').innerText = seconds;
-
-                        if (days < 30) {
-                            document.body.classList.add('theme-warm');
-                        }
-
-                        const progress = Math.min(100, Math.max(0, 100 - (distance / (365 * 24 * 60 * 60 * 1000) * 100)));
-                        const offset = 283 - (283 * progress / 100);
-                        
-                        const circle = document.getElementById('progressCircle');
-                        if(circle) circle.style.strokeDashoffset = offset;
-                        
-                        document.getElementById('progressPercent').innerText = Math.floor(progress) + '%';
-
-                        requestAnimationFrame(animate);
-                    };
-                    requestAnimationFrame(animate);
-                }
-            },
-
-            Budget: {
-                calcGifts() {
-                    const fam = Number(document.getElementById('guestsFamily').value) || 0;
-                    const fri = Number(document.getElementById('guestsFriends').value) || 0;
-                    const wrk = Number(document.getElementById('guestsWork').value) || 0;
-                    
-                    state.guests = { family: fam, friends: fri, work: wrk };
-                    
-                    const total = (fam * 1500) + (fri * 500) + (wrk * 350);
-                    document.getElementById('predictedIncome').innerText = `₪${total.toLocaleString()}`;
-                },
-
-                render() {
-                    const grid = document.getElementById('budgetGrid');
-                    grid.innerHTML = '';
-                    
-                    let totalPaid = 0;
-                    
-                    state.budget.forEach((cat, idx) => {
-                        totalPaid += Number(cat.paid || 0);
-                        const percent = cat.planned > 0 ? Math.min(100, (cat.paid / cat.planned) * 100) : 0;
-                        
-                        const el = document.createElement('div');
-                        el.className = 'glass p-3 rounded-xl flex items-center gap-3';
-                        el.innerHTML = `
-                            <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk" aria-hidden="true">
-                                <i class="fa-solid ${cat.icon}"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between mb-1">
-                                    <span class="font-bold text-sm text-dusk">${cat.name}</span>
-                                    <span class="text-xs text-dusk/60">₪${cat.paid} / ₪${cat.planned}</span>
-                                </div>
-                                <div class="w-full bg-white/30 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-sage h-full accent-target" style="width: ${percent}%"></div>
-                                </div>
-                            </div>
-                            <button onclick="WeddingApp.Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark transition-colors duration-200" aria-label="ערוך ${cat.name}"><i class="fa-solid fa-pen"></i></button>
-                        `;
-                        grid.appendChild(el);
-                    });
-
-                    document.getElementById('totalBudgetDisplay').innerText = `₪${state.totalBudget.toLocaleString()}`;
-                    document.getElementById('remainingDisplay').innerText = `₪${(state.totalBudget - totalPaid).toLocaleString()}`;
-                },
-
-                edit(idx) {
-                    const cat = state.budget[idx];
-                    const newPaid = prompt(`כמה שולם עבור ${cat.name}?`, cat.paid);
-                    if (newPaid !== null) {
-                        state.budget[idx].paid = Number(newPaid);
-                        state.budget = [...state.budget];
-                    }
-                }
-            },
-
-            Rabbinate: {
-                render() {
-                    const list = document.getElementById('rabbinateList');
-                    list.innerHTML = '';
-                    
-                    state.rabbinate.forEach((task, idx) => {
-                        const el = document.createElement('div');
-                        el.className = `p-4 rounded-xl flex items-center gap-3 ${task.done ? 'bg-sage/20 border border-sage' : 'bg-white/40 border border-white'}`;
-                        el.innerHTML = `
-                            <div onclick="WeddingApp.Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : 'border-dusk/20'}" role="checkbox" aria-checked="${task.done}" tabindex="0" aria-label="${task.text}">
-                                ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
-                            </div>
-                            <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
-                        `;
-                        list.appendChild(el);
-                    });
-                },
-
-                toggle(idx) {
-                    state.rabbinate[idx].done = !state.rabbinate[idx].done;
-                    state.rabbinate = [...state.rabbinate];
-                    if (state.rabbinate[idx].done) {
-                        confetti({
-                            particleCount: 150,
-                            spread: 70,
-                            origin: { y: 0.6 },
-                            colors: ['#D0E6D2', '#F5F5DC', '#D4AF37']
-                        });
-                    }
-                }
-            },
-
-            Vendors: {
-                render() {
-                    const list = document.getElementById('vendorsList');
-                    list.innerHTML = '';
-                    
-                    state.vendors.forEach((v, idx) => {
-                        const stars = '★'.repeat(v.rating) + '☆'.repeat(5 - v.rating);
-                        const el = document.createElement('div');
-                        el.className = 'glass p-4 rounded-2xl relative';
-                        el.innerHTML = `
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <span class="text-[10px] uppercase text-dusk/50 bg-white/50 px-2 py-0.5 rounded-full">${v.category}</span>
-                                    <h4 class="font-bold text-lg text-dusk mt-1">${v.name}</h4>
-                                </div>
-                                <div class="text-gold text-sm">${stars}</div>
-                            </div>
-                            <div class="flex gap-2 mt-3">
-                                <span class="text-xs px-2 py-1 rounded-md ${v.kosher ? 'bg-sage/30' : 'bg-red-100'}">
-                                    ${v.kosher ? 'כשר' : 'לא כשר'}
-                                </span>
-                                <span class="text-xs px-2 py-1 rounded-md ${v.contract ? 'bg-sage/30' : 'bg-yellow-100'}">
-                                    ${v.contract ? 'חוזה' : 'אין חוזה'}
-                                </span>
-                            </div>
-                            <button onclick="WeddingApp.Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400 transition-colors duration-200" aria-label="מחק ספק"><i class="fa-solid fa-trash"></i></button>
-                        `;
-                        list.appendChild(el);
-                    });
-                },
-
-                add() {
-                    const name = prompt("שם העסק:");
-                    if (!name) return;
-                    state.vendors.push({
-                        id: Date.now(),
-                        name: name,
-                        category: "כללי",
-                        price: 0,
-                        rating: 5,
-                        kosher: confirm("כשר?"),
-                        contract: false
-                    });
-                    state.vendors = [...state.vendors];
-                },
-
-                delete(idx) {
-                    if(confirm("למחוק?")) {
-                        state.vendors.splice(idx, 1);
-                        state.vendors = [...state.vendors];
-                    }
-                }
-            },
-
-            Notes: {
-                render() {
-                    const grid = document.getElementById('notesGrid');
-                    grid.innerHTML = '';
-                    
-                    state.notes.forEach((note, idx) => {
-                        const el = document.createElement('div');
-                        el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
-                        el.innerHTML = `
-                            <p class="text-dusk text-sm">${note.text}</p>
-                            <button onclick="WeddingApp.Notes.delete(${idx})" class="self-end text-dusk/30 hover:text-dusk transition-colors duration-200" aria-label="מחק פתק"><i class="fa-solid fa-trash-can"></i></button>
-                        `;
-                        grid.appendChild(el);
-                    });
-                },
-
-                add() {
-                    const text = prompt("תוכן:");
-                    if (!text) return;
-                    const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100'];
-                    state.notes.push({ id: Date.now(), text, color: colors[Math.floor(Math.random() * colors.length)] });
-                    state.notes = [...state.notes];
-                },
-
-                delete(idx) {
-                    state.notes.splice(idx, 1);
-                    state.notes = [...state.notes];
-                }
-            },
-
-            init() {
-                this.Dashboard.renderHero();
-                this.Budget.render();
-                this.Rabbinate.render();
-                this.Vendors.render();
-                this.Notes.render();
-                this.Dashboard.startTimer();
-                this.navTo('home');
-                
-                document.getElementById('guestsFamily').value = state.guests.family || '';
-                document.getElementById('guestsFriends').value = state.guests.friends || '';
-                document.getElementById('guestsWork').value = state.guests.work || '';
-                this.Budget.calcGifts();
-            },
-
-            navTo(tabName) {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`view-${tabName}`).classList.remove('hidden');
-                
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    if(btn.dataset.target === tabName) {
-                        btn.classList.remove('text-dusk/40');
-                        btn.classList.add('text-sageDark');
-                    } else {
-                        btn.classList.add('text-dusk/40');
-                        btn.classList.remove('text-sageDark');
-                    }
-                });
-            },
-
-            openSettings() {
-                document.getElementById('groomInput').value = state.couple.groom;
-                document.getElementById('brideInput').value = state.couple.bride;
-                document.getElementById('dateInput').value = state.couple.date;
-                document.getElementById('budgetInput').value = state.totalBudget;
-                document.getElementById('settingsModal').classList.remove('hidden');
-            },
-
-            closeSettings() {
-                document.getElementById('settingsModal').classList.add('hidden');
-            },
-
-            saveSettings() {
-                state.couple.groom = document.getElementById('groomInput').value;
-                state.couple.bride = document.getElementById('brideInput').value;
-                state.couple.date = document.getElementById('dateInput').value;
-                state.totalBudget = Number(document.getElementById('budgetInput').value);
-                state.couple = { ...state.couple };
-                this.closeSettings();
+        async function deleteGuest(id) {
+            if(confirm('למחוק אורח זה?')) {
+                await fetch(`/api/guests?id=${id}`, { method: 'DELETE' });
+                loadGuests();
             }
-        };
+        }
 
-        window.WeddingApp = WeddingApp;
-        WeddingApp.init();
+        // --- Settings Modal ---
+        function openSettingsModal() {
+             document.getElementById('modalTitle').innerText = "הגדרות חתונה";
+             document.getElementById('modalBody').innerHTML = `
+                <label>תקציב כולל:</label>
+                <input type="number" id="sBudget" class="app-input" value="${state.settings.total_budget}">
+                <label>שם חתן:</label>
+                <input type="text" id="sGroom" class="app-input" value="${state.settings.groom_name}">
+                <label>שם כלה:</label>
+                <input type="text" id="sBride" class="app-input" value="${state.settings.bride_name}">
+                <label>תאריך:</label>
+                <input type="date" id="sDate" class="app-input" value="${state.settings.wedding_date}">
+            `;
+            document.getElementById('modalActionBtn').onclick = saveSettings;
+            document.getElementById('itemModal').style.display = 'flex';
+        }
 
+        async function saveSettings() {
+             const data = {
+                total_budget: document.getElementById('sBudget').value,
+                groom_name: document.getElementById('sGroom').value,
+                bride_name: document.getElementById('sBride').value,
+                wedding_date: document.getElementById('sDate').value
+            };
+            await fetch('/api/settings', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            closeModal();
+            loadDashboard(); // Refresh
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('itemModal')) {
+                closeModal();
+            }
+        }
     </script>
 </body>
 </html>
