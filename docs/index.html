@@ -3,36 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wedding Elite Premium</title>
+    <title>Wedding Elite Premium | מערכת ניהול חתונות מתקדמת</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Confetti -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Rubik', 'sans-serif'] },
+                    fontFamily: { sans: ['Heebo', 'sans-serif'] },
                     colors: {
                         ivory: '#F5F5DC',
                         sage: '#D0E6D2',
                         sageDark: '#8FBC94',
                         dusk: '#4C5578',
                         gold: '#D4AF37',
-                        warm: '#E6B89C', // For dynamic shift
-                    },
-                    boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(76, 85, 120, 0.07)',
-                        'neumorph': '20px 20px 60px #d1d1bb, -20px -20px 60px #ffffff'
+                        warm: '#F0E6D2',
                     }
                 }
             }
@@ -45,24 +34,21 @@
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.4);
             --text-main: #4C5578;
+            --accent-color: #8FBC94;
         }
 
-        /* Dynamic Theme: Warm/Festive Mode */
-        body.theme-festive {
-            --bg-color: #F0E6D2; /* Warmer Ivory */
-        }
-        body.theme-festive .accent-target {
-            color: #D4AF37 !important; /* Gold override */
+        body.theme-warm {
+            --bg-color: #F0E6D2;
+            --accent-color: #D4AF37;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            -webkit-tap-highlight-color: transparent;
             transition: background-color 1.5s ease;
+            -webkit-font-smoothing: antialiased;
         }
         
-        /* Premium Glassmorphism */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
@@ -77,13 +63,8 @@
             border-top: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Smooth Transitions */
-        .transition-all-300 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Radial Progress */
         .radial-progress {
             transform: rotate(-90deg);
-            transform-origin: 50% 50%;
         }
         .radial-circle {
             stroke-dasharray: 283;
@@ -91,14 +72,12 @@
             transition: stroke-dashoffset 1s ease-in-out;
         }
         
-        /* Animations */
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
         
-        /* Post-it Note Style */
         .note-card {
             transition: transform 0.2s;
         }
@@ -106,110 +85,106 @@
             transform: scale(1.02) rotate(1deg);
             z-index: 10;
         }
+
+        .accent-target {
+            color: var(--accent-color);
+        }
     </style>
 </head>
-<body class="pb-32 antialiased selection:bg-sage selection:text-dusk">
+<body class="pb-32 antialiased">
 
-    <!-- Sticky Header -->
-    <header class="fixed top-0 left-0 right-0 z-40 glass transition-all-300">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 glass">
         <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target transition-colors duration-1000">
+                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target">
                     <i class="fa-solid fa-ring"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight text-dusk tracking-wide">WEDDING ELITE</h1>
-                    <p class="text-[10px] text-dusk/60 font-medium tracking-widest uppercase">Premium Planner</p>
+                    <h1 class="font-bold text-lg text-dusk">WEDDING ELITE</h1>
+                    <p class="text-[10px] text-dusk/60 uppercase">Premium</p>
                 </div>
             </div>
-            <button onclick="App.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors">
+            <button onclick="WeddingApp.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk">
                 <i class="fa-solid fa-gear"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-3xl mx-auto px-5 pt-24 space-y-8">
 
-        <!-- DASHBOARD VIEW -->
+        <!-- DASHBOARD -->
         <div id="view-home" class="view-section">
-            <!-- Smart Dashboard Hero -->
-            <section class="glass rounded-3xl p-8 shadow-glass text-center relative overflow-hidden animate-slide-up">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sage to-dusk opacity-50"></div>
-                
+            <section class="glass rounded-3xl p-8 shadow-lg text-center animate-slide-up">
                 <div class="flex justify-between items-start mb-6">
                     <div class="text-right">
-                        <h2 class="text-2xl font-bold text-dusk" id="coupleNamesDisplay">...</h2>
-                        <p class="text-sm text-dusk/60 font-light" id="weddingDateDisplay">--/--/----</p>
+                        <h2 class="text-2xl font-bold text-dusk" id="coupleNames">...</h2>
+                        <p class="text-sm text-dusk/60" id="weddingDateText">--/--/----</p>
                     </div>
-                    <!-- Radial Progress -->
                     <div class="relative w-16 h-16">
                         <svg class="w-full h-full radial-progress" viewBox="0 0 100 100">
                             <circle class="text-dusk/10 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
-                            <circle id="progressCircle" class="text-sage stroke-current radial-circle accent-target" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dashoffset="283"></circle>
+                            <circle id="progressCircle" class="accent-target stroke-current radial-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent"></circle>
                         </svg>
                         <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold text-dusk">
-                            <span id="progressText">0%</span>
+                            <span id="progressPercent">0%</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Countdown -->
-                <div class="grid grid-cols-4 gap-2 mb-2">
-                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="bg-white/40 rounded-2xl p-3">
                         <span class="block text-2xl font-bold text-dusk" id="timerDays">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">ימים</span>
+                        <span class="text-[10px] text-dusk/60 uppercase">ימים</span>
                     </div>
-                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                    <div class="bg-white/40 rounded-2xl p-3">
                         <span class="block text-2xl font-bold text-dusk" id="timerHours">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">שעות</span>
+                        <span class="text-[10px] text-dusk/60 uppercase">שעות</span>
                     </div>
-                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                    <div class="bg-white/40 rounded-2xl p-3">
                         <span class="block text-2xl font-bold text-dusk" id="timerMins">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">דקות</span>
+                        <span class="text-[10px] text-dusk/60 uppercase">דקות</span>
                     </div>
-                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                    <div class="bg-white/40 rounded-2xl p-3">
                         <span class="block text-2xl font-bold text-dusk" id="timerSecs">0</span>
-                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">שניות</span>
+                        <span class="text-[10px] text-dusk/60 uppercase">שניות</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Quick Actions Grid -->
-            <div class="grid grid-cols-2 gap-4 mt-6 animate-slide-up" style="animation-delay: 0.1s;">
-                <div onclick="App.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32 group">
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div onclick="WeddingApp.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 flex flex-col items-center justify-center gap-2 h-32">
                     <i class="fa-solid fa-scroll text-2xl text-dusk/80"></i>
                     <span class="font-medium text-sm">הרבנות</span>
                 </div>
-                <div onclick="App.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32 group">
+                <div onclick="WeddingApp.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 flex flex-col items-center justify-center gap-2 h-32">
                     <i class="fa-solid fa-store text-2xl text-dusk/80"></i>
                     <span class="font-medium text-sm">ספקים</span>
                 </div>
             </div>
         </div>
 
-        <!-- BUDGET VIEW -->
+        <!-- BUDGET -->
         <div id="view-budget" class="view-section hidden">
             <section class="animate-slide-up">
                 <h3 class="text-xl font-bold text-dusk mb-4 px-2">מנוע תקציב חכם</h3>
                 
-                <!-- Gift Predictor -->
                 <div class="glass p-5 rounded-2xl mb-6 border-r-4 border-sage">
                     <h4 class="font-bold text-sm text-dusk mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-calculator text-sageDark"></i> צפי מתנות (ממוצע ארצי)
+                        <i class="fa-solid fa-calculator text-sageDark"></i> צפי מתנות
                     </h4>
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
-                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
+                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
-                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
+                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
-                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
+                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm" oninput="WeddingApp.Budget.calcGifts()">
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-dusk/10 flex justify-between items-center">
@@ -218,54 +193,52 @@
                     </div>
                 </div>
 
-                <!-- Budget Summary -->
                 <div class="grid grid-cols-2 gap-3 mb-6">
                     <div class="glass p-4 rounded-2xl">
                         <p class="text-xs text-dusk/60 mb-1">תקציב יעד</p>
                         <p class="font-bold text-dusk text-xl" id="totalBudgetDisplay">₪0</p>
                     </div>
                     <div class="glass p-4 rounded-2xl">
-                        <p class="text-xs text-dusk/60 mb-1">נותר להוצאות</p>
-                        <p class="font-bold text-sageDark text-xl" id="totalRemainingDisplay">₪0</p>
+                        <p class="text-xs text-dusk/60 mb-1">נותר</p>
+                        <p class="font-bold text-sageDark text-xl" id="remainingDisplay">₪0</p>
                     </div>
                 </div>
 
-                <!-- Categories -->
                 <div id="budgetGrid" class="space-y-3"></div>
             </section>
         </div>
 
-        <!-- RABBINATE VIEW -->
+        <!-- RABBINATE -->
         <div id="view-rabbinate" class="view-section hidden">
             <section class="animate-slide-up">
                 <h3 class="text-xl font-bold text-dusk mb-4 px-2">הליך ברבנות</h3>
                 <div class="glass p-4 rounded-2xl mb-4">
-                    <p class="text-sm text-dusk/80 leading-relaxed">
+                    <p class="text-sm text-dusk/80">
                         <i class="fa-solid fa-circle-info text-sageDark ml-1"></i>
-                        יש לפתוח תיק נישואין בין 45 יום ל-3 חודשים לפני החתונה.
+                        יש לפתוח תיק בין 45 יום ל-3 חודשים לפני החתונה.
                     </p>
                 </div>
                 <div id="rabbinateList" class="space-y-3"></div>
             </section>
         </div>
 
-        <!-- VENDORS VIEW -->
+        <!-- VENDORS -->
         <div id="view-vendors" class="view-section hidden">
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
                     <h3 class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
-                    <button onclick="Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm hover:bg-sageDark transition-colors"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="WeddingApp.Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="vendorsList" class="grid grid-cols-1 gap-4"></div>
             </section>
         </div>
 
-        <!-- NOTES VIEW -->
+        <!-- NOTES -->
         <div id="view-notes" class="view-section hidden">
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
                     <h3 class="text-xl font-bold text-dusk">לוח השראה</h3>
-                    <button onclick="Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm hover:bg-sageDark transition-colors"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="WeddingApp.Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="notesGrid" class="grid grid-cols-2 gap-4"></div>
             </section>
@@ -273,27 +246,27 @@
 
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Nav -->
     <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2">
         <div class="flex justify-around items-center h-16 max-w-3xl mx-auto px-2">
-            <button onclick="App.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="home">
-                <i class="fa-solid fa-house text-xl mb-0.5"></i>
+            <button onclick="WeddingApp.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="home">
+                <i class="fa-solid fa-house text-xl"></i>
                 <span class="text-[10px] font-medium">בית</span>
             </button>
-            <button onclick="App.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="budget">
-                <i class="fa-solid fa-sack-dollar text-xl mb-0.5"></i>
+            <button onclick="WeddingApp.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="budget">
+                <i class="fa-solid fa-sack-dollar text-xl"></i>
                 <span class="text-[10px] font-medium">תקציב</span>
             </button>
-            <button onclick="App.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="rabbinate">
-                <i class="fa-solid fa-scroll text-xl mb-0.5"></i>
+            <button onclick="WeddingApp.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="rabbinate">
+                <i class="fa-solid fa-scroll text-xl"></i>
                 <span class="text-[10px] font-medium">רבנות</span>
             </button>
-            <button onclick="App.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="vendors">
-                <i class="fa-solid fa-store text-xl mb-0.5"></i>
+            <button onclick="WeddingApp.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="vendors">
+                <i class="fa-solid fa-store text-xl"></i>
                 <span class="text-[10px] font-medium">ספקים</span>
             </button>
-            <button onclick="App.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="notes">
-                <i class="fa-solid fa-note-sticky text-xl mb-0.5"></i>
+            <button onclick="WeddingApp.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 w-14" data-target="notes">
+                <i class="fa-solid fa-note-sticky text-xl"></i>
                 <span class="text-[10px] font-medium">פתקים</span>
             </button>
         </div>
@@ -301,50 +274,43 @@
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="App.closeSettings()"></div>
-        <div class="glass w-full max-w-md rounded-3xl shadow-neumorph relative z-10 p-6 animate-slide-up bg-ivory">
+        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="WeddingApp.closeSettings()"></div>
+        <div class="glass w-full max-w-md rounded-3xl relative z-10 p-6 animate-slide-up bg-ivory">
             <h3 class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-dusk/70 mb-1">שם החתן</label>
-                    <input type="text" id="groomNameInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
+                    <input type="text" id="groomInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-dusk/70 mb-1">שם הכלה</label>
-                    <input type="text" id="brideNameInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
+                    <input type="text" id="brideInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-dusk/70 mb-1">תאריך החתונה</label>
-                    <input type="date" id="weddingDateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
+                    <input type="date" id="dateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל (יעד)</label>
-                    <input type="number" id="totalBudgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
+                    <label class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל</label>
+                    <input type="number" id="budgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3">
                 </div>
             </div>
 
             <div class="mt-8 flex gap-3">
-                <button onclick="App.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform">
-                    שמור שינויים
+                <button onclick="WeddingApp.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl">
+                    שמור
                 </button>
-                <button onclick="App.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50">
+                <button onclick="WeddingApp.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium">
                     ביטול
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- APP LOGIC -->
     <script type="module">
-        /**
-         * Wedding Elite Premium - Core Architecture
-         * Uses Proxy for reactive state and debounced persistence.
-         */
+        const DB_KEY = 'wedding_elite_premium';
 
-        const DB_KEY = 'wedding_elite_premium_v1';
-
-        // --- Initial State ---
         const initialState = {
             totalBudget: 125000,
             guests: { family: 0, friends: 0, work: 0 },
@@ -365,297 +331,270 @@
                 { id: 3, text: "תעודות רווקות", done: false },
                 { id: 4, text: "אישור מקווה", done: false }
             ],
-            vendors: [
-                { id: 1, name: "אולמי בראשית", category: "אולם", price: 85000, rating: 5, kosher: true, contract: true },
-                { id: 2, name: "צלם מגנטים", category: "אטרקציות", price: 1500, rating: 4, kosher: false, contract: false }
-            ],
-            notes: [
-                { id: 1, text: "לבדוק עיצוב חופה בסגנון בוהו", color: "bg-yellow-100" },
-                { id: 2, text: "רשימת שירים ל-DJ", color: "bg-purple-100" }
-            ]
+            vendors: [],
+            notes: []
         };
 
-        // --- Persistence Engine ---
+        const debounce = (func, wait) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        };
+
         const saveToStorage = (state) => {
             localStorage.setItem(DB_KEY, JSON.stringify(state));
         };
         
-        // Debounce function
-        const debounce = (func, wait) => {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        };
-        
         const debouncedSave = debounce(saveToStorage, 1000);
 
-        // --- Reactive State Proxy ---
         const handler = {
             set(target, property, value) {
                 target[property] = value;
                 debouncedSave(state);
-                // Trigger UI updates based on what changed
-                if (property === 'budget' || property === 'guests') Budget.render();
-                if (property === 'rabbinate') Rabbinate.render();
-                if (property === 'vendors') Vendors.render();
-                if (property === 'notes') Notes.render();
-                if (property === 'couple') Dashboard.renderHero();
+                if (property === 'budget' || property === 'guests') WeddingApp.Budget.render();
+                if (property === 'rabbinate') WeddingApp.Rabbinate.render();
+                if (property === 'vendors') WeddingApp.Vendors.render();
+                if (property === 'notes') WeddingApp.Notes.render();
+                if (property === 'couple') WeddingApp.Dashboard.renderHero();
                 return true;
             }
         };
 
-        // Load or Init
         let loadedData = JSON.parse(localStorage.getItem(DB_KEY)) || initialState;
         loadedData = { ...initialState, ...loadedData };
         
         const state = new Proxy(loadedData, handler);
 
-        // --- Modules ---
+        const WeddingApp = {
+            Dashboard: {
+                renderHero() {
+                    document.getElementById('coupleNames').textContent = `${state.couple.groom} & ${state.couple.bride}`;
+                    document.getElementById('weddingDateText').textContent = new Date(state.couple.date).toLocaleDateString('he-IL');
+                },
 
-        const Theme = {
-            update(daysRemaining) {
-                const body = document.body;
-                if (daysRemaining < 30) {
-                    body.classList.add('theme-festive');
-                } else {
-                    body.classList.remove('theme-festive');
-                }
-            }
-        };
+                startTimer() {
+                    const animate = () => {
+                        const now = new Date().getTime();
+                        const weddingDate = new Date(state.couple.date).getTime();
+                        const distance = weddingDate - now;
 
-        const Dashboard = {
-            renderHero() {
-                document.getElementById('coupleNamesDisplay').textContent = `${state.couple.groom} & ${state.couple.bride}`;
-                document.getElementById('weddingDateDisplay').textContent = new Date(state.couple.date).toLocaleDateString('he-IL');
-            },
+                        if (distance < 0) return;
 
-            startTimer() {
-                const animate = () => {
-                    const now = new Date().getTime();
-                    const weddingDate = new Date(state.couple.date).getTime();
-                    const distance = weddingDate - now;
+                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    if (distance < 0) return;
+                        document.getElementById('timerDays').innerText = days;
+                        document.getElementById('timerHours').innerText = hours;
+                        document.getElementById('timerMins').innerText = minutes;
+                        document.getElementById('timerSecs').innerText = seconds;
 
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        if (days < 30) {
+                            document.body.classList.add('theme-warm');
+                        }
 
-                    document.getElementById('timerDays').innerText = days;
-                    document.getElementById('timerHours').innerText = hours;
-                    document.getElementById('timerMins').innerText = minutes;
-                    document.getElementById('timerSecs').innerText = seconds;
+                        const progress = Math.min(100, Math.max(0, 100 - (distance / (365 * 24 * 60 * 60 * 1000) * 100)));
+                        const offset = 283 - (283 * progress / 100);
+                        
+                        const circle = document.getElementById('progressCircle');
+                        if(circle) circle.style.strokeDashoffset = offset;
+                        
+                        document.getElementById('progressPercent').innerText = Math.floor(progress) + '%';
 
-                    // Theme Update
-                    Theme.update(days);
-
-                    // Radial Progress
-                    const totalTime = 1000 * 60 * 60 * 24 * 365; 
-                    const progress = Math.min(100, Math.max(0, 100 - (distance / totalTime * 100)));
-                    const offset = 283 - (283 * progress / 100);
-                    
-                    const circle = document.getElementById('progressCircle');
-                    if(circle) circle.style.strokeDashoffset = offset;
-                    
-                    const text = document.getElementById('progressText');
-                    if(text) text.innerText = Math.floor(progress) + '%';
-
+                        requestAnimationFrame(animate);
+                    };
                     requestAnimationFrame(animate);
-                };
-                requestAnimationFrame(animate);
-            }
-        };
-
-        const Budget = {
-            calcGifts() {
-                const fam = Number(document.getElementById('guestsFamily').value) || 0;
-                const fri = Number(document.getElementById('guestsFriends').value) || 0;
-                const wrk = Number(document.getElementById('guestsWork').value) || 0;
-                
-                state.guests = { family: fam, friends: fri, work: wrk };
-                
-                const total = (fam * 1500) + (fri * 500) + (wrk * 350);
-                document.getElementById('predictedIncome').innerText = `₪${total.toLocaleString()}`;
+                }
             },
 
-            render() {
-                const grid = document.getElementById('budgetGrid');
-                grid.innerHTML = '';
-                
-                let totalPaid = 0;
-                
-                state.budget.forEach((cat, idx) => {
-                    totalPaid += Number(cat.paid || 0);
-                    const percent = cat.planned > 0 ? Math.min(100, (cat.paid / cat.planned) * 100) : 0;
+            Budget: {
+                calcGifts() {
+                    const fam = Number(document.getElementById('guestsFamily').value) || 0;
+                    const fri = Number(document.getElementById('guestsFriends').value) || 0;
+                    const wrk = Number(document.getElementById('guestsWork').value) || 0;
                     
-                    const el = document.createElement('div');
-                    el.className = 'glass p-3 rounded-xl flex items-center gap-3';
-                    el.innerHTML = `
-                        <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk">
-                            <i class="fa-solid ${cat.icon}"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between mb-1">
-                                <span class="font-bold text-sm text-dusk">${cat.name}</span>
-                                <span class="text-xs text-dusk/60">₪${cat.paid} / ₪${cat.planned}</span>
-                            </div>
-                            <div class="w-full bg-white/30 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-sage h-full accent-target" style="width: ${percent}%"></div>
-                            </div>
-                        </div>
-                        <button onclick="Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
-                    `;
-                    grid.appendChild(el);
-                });
+                    state.guests = { family: fam, friends: fri, work: wrk };
+                    
+                    const total = (fam * 1500) + (fri * 500) + (wrk * 350);
+                    document.getElementById('predictedIncome').innerText = `₪${total.toLocaleString()}`;
+                },
 
-                document.getElementById('totalBudgetDisplay').innerText = `₪${state.totalBudget.toLocaleString()}`;
-                document.getElementById('totalRemainingDisplay').innerText = `₪${(state.totalBudget - totalPaid).toLocaleString()}`;
-            },
+                render() {
+                    const grid = document.getElementById('budgetGrid');
+                    grid.innerHTML = '';
+                    
+                    let totalPaid = 0;
+                    
+                    state.budget.forEach((cat, idx) => {
+                        totalPaid += Number(cat.paid || 0);
+                        const percent = cat.planned > 0 ? Math.min(100, (cat.paid / cat.planned) * 100) : 0;
+                        
+                        const el = document.createElement('div');
+                        el.className = 'glass p-3 rounded-xl flex items-center gap-3';
+                        el.innerHTML = `
+                            <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk">
+                                <i class="fa-solid ${cat.icon}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-bold text-sm text-dusk">${cat.name}</span>
+                                    <span class="text-xs text-dusk/60">₪${cat.paid} / ₪${cat.planned}</span>
+                                </div>
+                                <div class="w-full bg-white/30 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-sage h-full accent-target" style="width: ${percent}%"></div>
+                                </div>
+                            </div>
+                            <button onclick="WeddingApp.Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
+                        `;
+                        grid.appendChild(el);
+                    });
 
-            edit(idx) {
-                const cat = state.budget[idx];
-                const newPaid = prompt(`כמה שולם עבור ${cat.name}?`, cat.paid);
-                if (newPaid !== null) {
-                    state.budget[idx].paid = Number(newPaid);
-                    state.budget = [...state.budget]; // Trigger proxy
+                    document.getElementById('totalBudgetDisplay').innerText = `₪${state.totalBudget.toLocaleString()}`;
+                    document.getElementById('remainingDisplay').innerText = `₪${(state.totalBudget - totalPaid).toLocaleString()}`;
+                },
+
+                edit(idx) {
+                    const cat = state.budget[idx];
+                    const newPaid = prompt(`כמה שולם עבור ${cat.name}?`, cat.paid);
+                    if (newPaid !== null) {
+                        state.budget[idx].paid = Number(newPaid);
+                        state.budget = [...state.budget];
+                    }
                 }
-            }
-        };
-
-        const Rabbinate = {
-            render() {
-                const list = document.getElementById('rabbinateList');
-                list.innerHTML = '';
-                
-                state.rabbinate.forEach((task, idx) => {
-                    const el = document.createElement('div');
-                    el.className = `p-4 rounded-xl border transition-all flex items-center gap-3 ${task.done ? 'bg-sage/20 border-sage' : 'bg-white/40 border-white'}`;
-                    el.innerHTML = `
-                        <div onclick="Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 border-dusk/20 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : ''}">
-                            ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
-                        </div>
-                        <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
-                    `;
-                    list.appendChild(el);
-                });
             },
 
-            toggle(idx) {
-                state.rabbinate[idx].done = !state.rabbinate[idx].done;
-                state.rabbinate = [...state.rabbinate];
-                if (state.rabbinate[idx].done) App.confetti();
-            }
-        };
-
-        const Vendors = {
-            render() {
-                const list = document.getElementById('vendorsList');
-                list.innerHTML = '';
-                
-                state.vendors.forEach((v, idx) => {
-                    const stars = '★'.repeat(v.rating) + '☆'.repeat(5 - v.rating);
-                    const el = document.createElement('div');
-                    el.className = 'glass p-4 rounded-2xl relative group';
-                    el.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <span class="text-[10px] uppercase tracking-wider text-dusk/50 bg-white/50 px-2 py-0.5 rounded-full">${v.category}</span>
-                                <h4 class="font-bold text-lg text-dusk mt-1">${v.name}</h4>
+            Rabbinate: {
+                render() {
+                    const list = document.getElementById('rabbinateList');
+                    list.innerHTML = '';
+                    
+                    state.rabbinate.forEach((task, idx) => {
+                        const el = document.createElement('div');
+                        el.className = `p-4 rounded-xl flex items-center gap-3 ${task.done ? 'bg-sage/20 border border-sage' : 'bg-white/40 border border-white'}`;
+                        el.innerHTML = `
+                            <div onclick="WeddingApp.Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : 'border-dusk/20'}">
+                                ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
                             </div>
-                            <div class="text-gold text-sm tracking-widest">${stars}</div>
-                        </div>
-                        <div class="flex gap-2 mt-3">
-                            <span class="text-xs px-2 py-1 rounded-md ${v.kosher ? 'bg-sage/30 text-dusk' : 'bg-red-100 text-red-800'}">
-                                ${v.kosher ? 'כשר' : 'לא כשר'}
-                            </span>
-                            <span class="text-xs px-2 py-1 rounded-md ${v.contract ? 'bg-sage/30 text-dusk' : 'bg-yellow-100 text-yellow-800'}">
-                                ${v.contract ? 'חוזה חתום' : 'אין חוזה'}
-                            </span>
-                        </div>
-                        <button onclick="Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
-                    `;
-                    list.appendChild(el);
-                });
+                            <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
+                        `;
+                        list.appendChild(el);
+                    });
+                },
+
+                toggle(idx) {
+                    state.rabbinate[idx].done = !state.rabbinate[idx].done;
+                    state.rabbinate = [...state.rabbinate];
+                    if (state.rabbinate[idx].done) {
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            colors: ['#D0E6D2', '#F5F5DC', '#D4AF37']
+                        });
+                    }
+                }
             },
 
-            add() {
-                const name = prompt("שם העסק:");
-                if (!name) return;
-                state.vendors.push({
-                    id: Date.now(),
-                    name: name,
-                    category: "כללי",
-                    price: 0,
-                    rating: 5,
-                    kosher: confirm("האם יש תעודת כשרות?"),
-                    contract: false
-                });
-                state.vendors = [...state.vendors];
-            },
+            Vendors: {
+                render() {
+                    const list = document.getElementById('vendorsList');
+                    list.innerHTML = '';
+                    
+                    state.vendors.forEach((v, idx) => {
+                        const stars = '★'.repeat(v.rating) + '☆'.repeat(5 - v.rating);
+                        const el = document.createElement('div');
+                        el.className = 'glass p-4 rounded-2xl relative';
+                        el.innerHTML = `
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-[10px] uppercase text-dusk/50 bg-white/50 px-2 py-0.5 rounded-full">${v.category}</span>
+                                    <h4 class="font-bold text-lg text-dusk mt-1">${v.name}</h4>
+                                </div>
+                                <div class="text-gold text-sm">${stars}</div>
+                            </div>
+                            <div class="flex gap-2 mt-3">
+                                <span class="text-xs px-2 py-1 rounded-md ${v.kosher ? 'bg-sage/30' : 'bg-red-100'}">
+                                    ${v.kosher ? 'כשר' : 'לא כשר'}
+                                </span>
+                                <span class="text-xs px-2 py-1 rounded-md ${v.contract ? 'bg-sage/30' : 'bg-yellow-100'}">
+                                    ${v.contract ? 'חוזה' : 'אין חוזה'}
+                                </span>
+                            </div>
+                            <button onclick="WeddingApp.Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                        `;
+                        list.appendChild(el);
+                    });
+                },
 
-            delete(idx) {
-                if(confirm("למחוק ספק זה?")) {
-                    state.vendors.splice(idx, 1);
+                add() {
+                    const name = prompt("שם העסק:");
+                    if (!name) return;
+                    state.vendors.push({
+                        id: Date.now(),
+                        name: name,
+                        category: "כללי",
+                        price: 0,
+                        rating: 5,
+                        kosher: confirm("כשר?"),
+                        contract: false
+                    });
                     state.vendors = [...state.vendors];
+                },
+
+                delete(idx) {
+                    if(confirm("למחוק?")) {
+                        state.vendors.splice(idx, 1);
+                        state.vendors = [...state.vendors];
+                    }
                 }
-            }
-        };
-
-        const Notes = {
-            render() {
-                const grid = document.getElementById('notesGrid');
-                grid.innerHTML = '';
-                
-                state.notes.forEach((note, idx) => {
-                    const el = document.createElement('div');
-                    el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
-                    el.innerHTML = `
-                        <p class="text-dusk font-handwriting text-sm leading-relaxed">${note.text}</p>
-                        <button onclick="Notes.delete(${idx})" class="self-end text-dusk/30 hover:text-dusk"><i class="fa-solid fa-trash-can"></i></button>
-                    `;
-                    grid.appendChild(el);
-                });
             },
 
-            add() {
-                const text = prompt("תוכן הפתק:");
-                if (!text) return;
-                const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100'];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                state.notes.push({ id: Date.now(), text, color: randomColor });
-                state.notes = [...state.notes];
+            Notes: {
+                render() {
+                    const grid = document.getElementById('notesGrid');
+                    grid.innerHTML = '';
+                    
+                    state.notes.forEach((note, idx) => {
+                        const el = document.createElement('div');
+                        el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
+                        el.innerHTML = `
+                            <p class="text-dusk text-sm">${note.text}</p>
+                            <button onclick="WeddingApp.Notes.delete(${idx})" class="self-end text-dusk/30"><i class="fa-solid fa-trash-can"></i></button>
+                        `;
+                        grid.appendChild(el);
+                    });
+                },
+
+                add() {
+                    const text = prompt("תוכן:");
+                    if (!text) return;
+                    const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100'];
+                    state.notes.push({ id: Date.now(), text, color: colors[Math.floor(Math.random() * colors.length)] });
+                    state.notes = [...state.notes];
+                },
+
+                delete(idx) {
+                    state.notes.splice(idx, 1);
+                    state.notes = [...state.notes];
+                }
             },
 
-            delete(idx) {
-                state.notes.splice(idx, 1);
-                state.notes = [...state.notes];
-            }
-        };
-
-        // --- App Core ---
-        const App = {
             init() {
-                Dashboard.renderHero();
-                Budget.render();
-                Rabbinate.render();
-                Vendors.render();
-                Notes.render();
-                Dashboard.startTimer();
+                this.Dashboard.renderHero();
+                this.Budget.render();
+                this.Rabbinate.render();
+                this.Vendors.render();
+                this.Notes.render();
+                this.Dashboard.startTimer();
                 this.navTo('home');
                 
-                // Restore inputs
                 document.getElementById('guestsFamily').value = state.guests.family || '';
                 document.getElementById('guestsFriends').value = state.guests.friends || '';
                 document.getElementById('guestsWork').value = state.guests.work || '';
-                Budget.calcGifts();
+                this.Budget.calcGifts();
             },
 
             navTo(tabName) {
@@ -665,19 +604,19 @@
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     if(btn.dataset.target === tabName) {
                         btn.classList.remove('text-dusk/40');
-                        btn.classList.add('text-sageDark', 'scale-110');
+                        btn.classList.add('text-sageDark');
                     } else {
                         btn.classList.add('text-dusk/40');
-                        btn.classList.remove('text-sageDark', 'scale-110');
+                        btn.classList.remove('text-sageDark');
                     }
                 });
             },
 
             openSettings() {
-                document.getElementById('groomNameInput').value = state.couple.groom;
-                document.getElementById('brideNameInput').value = state.couple.bride;
-                document.getElementById('weddingDateInput').value = state.couple.date;
-                document.getElementById('totalBudgetInput').value = state.totalBudget;
+                document.getElementById('groomInput').value = state.couple.groom;
+                document.getElementById('brideInput').value = state.couple.bride;
+                document.getElementById('dateInput').value = state.couple.date;
+                document.getElementById('budgetInput').value = state.totalBudget;
                 document.getElementById('settingsModal').classList.remove('hidden');
             },
 
@@ -686,34 +625,17 @@
             },
 
             saveSettings() {
-                state.couple.groom = document.getElementById('groomNameInput').value;
-                state.couple.bride = document.getElementById('brideNameInput').value;
-                state.couple.date = document.getElementById('weddingDateInput').value;
-                state.totalBudget = Number(document.getElementById('totalBudgetInput').value);
-                
-                // Force deep update
+                state.couple.groom = document.getElementById('groomInput').value;
+                state.couple.bride = document.getElementById('brideInput').value;
+                state.couple.date = document.getElementById('dateInput').value;
+                state.totalBudget = Number(document.getElementById('budgetInput').value);
                 state.couple = { ...state.couple };
                 this.closeSettings();
-            },
-
-            confetti() {
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#D0E6D2', '#F5F5DC', '#D4AF37']
-                });
             }
         };
 
-        // Expose to window for HTML onclick handlers
-        window.App = App;
-        window.Budget = Budget;
-        window.Vendors = Vendors;
-        window.Notes = Notes;
-        window.Rabbinate = Rabbinate;
-
-        App.init();
+        window.WeddingApp = WeddingApp;
+        WeddingApp.init();
 
     </script>
 </body>
