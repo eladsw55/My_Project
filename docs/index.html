@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wedding Elite V3.0</title>
+    <title>Wedding Elite Premium</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,15 +23,16 @@
                 extend: {
                     fontFamily: { sans: ['Rubik', 'sans-serif'] },
                     colors: {
-                        primary: '#6366f1', // Indigo 500
-                        secondary: '#8b5cf6', // Violet 500
-                        gold: '#D4AF37', // Gold Accent
-                        surface: '#ffffff',
-                        background: '#f8fafc',
+                        ivory: '#F5F5DC',
+                        sage: '#D0E6D2',
+                        sageDark: '#A4C4A8',
+                        dusk: '#4C5578',
+                        gold: '#D4AF37',
+                        warm: '#E6B89C', // For dynamic shift
                     },
                     boxShadow: {
-                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)'
+                        'glass': '0 8px 32px 0 rgba(76, 85, 120, 0.1)',
+                        'neumorph': '20px 20px 60px #d1d1bb, -20px -20px 60px #ffffff'
                     }
                 }
             }
@@ -39,34 +40,46 @@
     </script>
 
     <style>
-        body {
-            background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Glassmorphism Header */
-        .glass-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        :root {
+            --bg-color: #F5F5DC;
+            --accent-color: #D0E6D2;
         }
 
-        /* Glass Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+        body {
+            background-color: var(--bg-color);
+            color: #4C5578;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 1s ease;
+        }
+        
+        /* Premium Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(76, 85, 120, 0.05);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         /* Smooth Transitions */
         .transition-all-300 { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        /* Radial Progress */
+        .radial-progress {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .radial-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
         
         /* Animations */
         @keyframes slideUp {
@@ -75,27 +88,31 @@
         }
         .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
         
-        .task-checkbox:checked + div {
-            text-decoration: line-through;
-            color: #94a3b8;
+        /* Post-it Note Style */
+        .note-card {
+            transition: transform 0.2s;
+        }
+        .note-card:hover {
+            transform: scale(1.02) rotate(1deg);
+            z-index: 10;
         }
     </style>
 </head>
-<body class="text-slate-800 pb-32">
+<body class="pb-32 antialiased selection:bg-sage selection:text-dusk">
 
     <!-- Sticky Header -->
-    <header class="fixed top-0 left-0 right-0 z-40 glass-header shadow-sm transition-all-300">
+    <header class="fixed top-0 left-0 right-0 z-40 glass transition-all-300">
         <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-lg">
-                    <i class="fa-solid fa-heart"></i>
+                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm">
+                    <i class="fa-solid fa-ring"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight text-slate-800">Wedding Elite</h1>
-                    <p class="text-xs text-slate-500 font-medium">המתכנן האישי שלכם</p>
+                    <h1 class="font-bold text-lg leading-tight text-dusk tracking-wide">WEDDING ELITE</h1>
+                    <p class="text-[10px] text-dusk/60 font-medium tracking-widest uppercase">Premium Planner</p>
                 </div>
             </div>
-            <button onclick="openSettingsModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors">
+            <button onclick="app.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors">
                 <i class="fa-solid fa-gear"></i>
             </button>
         </div>
@@ -104,524 +121,568 @@
     <!-- Main Content -->
     <main class="max-w-3xl mx-auto px-5 pt-24 space-y-8">
 
+        <!-- DASHBOARD VIEW -->
         <div id="view-home" class="view-section">
-        <!-- Hero Section (Countdown & Names) -->
-        <section class="glass-card rounded-3xl p-6 shadow-soft text-center relative overflow-hidden animate-slide-up">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-1" id="coupleNamesDisplay">טוען...</h2>
-            <p class="text-slate-500 mb-6" id="weddingDateDisplay">--/--/----</p>
-            
-            <div class="flex justify-center gap-4">
-                <div class="bg-slate-50 rounded-2xl p-4 w-24 shadow-sm border border-slate-100">
-                    <span class="block text-3xl font-bold text-primary" id="daysCount">0</span>
-                    <span class="text-xs text-slate-500 font-medium">ימים</span>
+            <!-- Smart Dashboard Hero -->
+            <section class="glass rounded-3xl p-8 shadow-glass text-center relative overflow-hidden animate-slide-up">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sage to-dusk opacity-50"></div>
+                
+                <div class="flex justify-between items-start mb-6">
+                    <div class="text-right">
+                        <h2 class="text-2xl font-bold text-dusk" id="coupleNamesDisplay">...</h2>
+                        <p class="text-sm text-dusk/60 font-light" id="weddingDateDisplay">--/--/----</p>
+                    </div>
+                    <!-- Radial Progress -->
+                    <div class="relative w-16 h-16">
+                        <svg class="w-full h-full radial-progress" viewBox="0 0 100 100">
+                            <circle class="text-dusk/10 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
+                            <circle id="progressCircle" class="text-sage stroke-current radial-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dashoffset="283"></circle>
+                        </svg>
+                        <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold text-dusk">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-slate-50 rounded-2xl p-4 w-24 shadow-sm border border-slate-100">
-                    <span class="block text-3xl font-bold text-slate-700" id="tasksLeftCount">0</span>
-                    <span class="text-xs text-slate-500 font-medium">משימות</span>
+                
+                <!-- Countdown -->
+                <div class="grid grid-cols-4 gap-2 mb-2">
+                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                        <span class="block text-2xl font-bold text-dusk" id="timerDays">0</span>
+                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">ימים</span>
+                    </div>
+                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                        <span class="block text-2xl font-bold text-dusk" id="timerHours">0</span>
+                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">שעות</span>
+                    </div>
+                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                        <span class="block text-2xl font-bold text-dusk" id="timerMins">0</span>
+                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">דקות</span>
+                    </div>
+                    <div class="bg-white/40 rounded-2xl p-3 backdrop-blur-sm">
+                        <span class="block text-2xl font-bold text-dusk" id="timerSecs">0</span>
+                        <span class="text-[10px] text-dusk/60 uppercase tracking-wider">שניות</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions Grid -->
+            <div class="grid grid-cols-2 gap-4 mt-6 animate-slide-up" style="animation-delay: 0.1s;">
+                <div onclick="app.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32">
+                    <i class="fa-solid fa-scroll text-2xl text-dusk/80"></i>
+                    <span class="font-medium text-sm">הרבנות</span>
+                </div>
+                <div onclick="app.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32">
+                    <i class="fa-solid fa-store text-2xl text-dusk/80"></i>
+                    <span class="font-medium text-sm">ספקים</span>
                 </div>
             </div>
-        </section>
         </div>
 
+        <!-- BUDGET VIEW -->
         <div id="view-budget" class="view-section hidden">
-        <!-- Budget Section -->
-        <section class="animate-slide-up" style="animation-delay: 0.1s;">
-            <div class="flex justify-between items-end mb-4">
-                <h3 class="text-xl font-bold text-slate-800">תקציב החתונה</h3>
-                <button onclick="openBudgetModal()" class="text-sm font-medium text-primary hover:text-secondary transition-colors">
-                    <i class="fa-solid fa-pen-to-square ml-1"></i> עריכה
-                </button>
-            </div>
+            <section class="animate-slide-up">
+                <h3 class="text-xl font-bold text-dusk mb-4 px-2">מנוע תקציב חכם</h3>
+                
+                <!-- Gift Predictor -->
+                <div class="glass p-5 rounded-2xl mb-6 border-r-4 border-sage">
+                    <h4 class="font-bold text-sm text-dusk mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-sageDark"></i> צפי מתנות (ממוצע ארצי)
+                    </h4>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                            <label class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
+                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
+                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
+                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-dusk/10 flex justify-between items-center">
+                        <span class="text-xs font-medium">צפי הכנסות:</span>
+                        <span class="text-lg font-bold text-sageDark" id="predictedIncome">₪0</span>
+                    </div>
+                </div>
 
-            <!-- Budget Summary Cards -->
-            <div class="grid grid-cols-3 gap-3 mb-6">
-                <div class="glass-card p-4 rounded-2xl shadow-soft cursor-pointer hover:bg-white/80 transition-colors" onclick="editTotalBudget()">
-                    <p class="text-xs text-slate-500 mb-1">תקציב כולל <i class="fa-solid fa-pen text-[10px] opacity-50 mr-1"></i></p>
-                    <p class="font-bold text-slate-800 text-lg" id="totalBudgetDisplay">₪0</p>
+                <!-- Budget Summary -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="glass p-4 rounded-2xl">
+                        <p class="text-xs text-dusk/60 mb-1">תקציב יעד</p>
+                        <p class="font-bold text-dusk text-xl" id="totalBudgetDisplay">₪0</p>
+                    </div>
+                    <div class="glass p-4 rounded-2xl">
+                        <p class="text-xs text-dusk/60 mb-1">נותר להוצאות</p>
+                        <p class="font-bold text-sageDark text-xl" id="totalRemainingDisplay">₪0</p>
+                    </div>
                 </div>
-                <div class="glass-card p-4 rounded-2xl shadow-soft">
-                    <p class="text-xs text-slate-500 mb-1">שולם</p>
-                    <p class="font-bold text-emerald-600 text-lg" id="totalPaidDisplay">₪0</p>
-                </div>
-                <div class="glass-card p-4 rounded-2xl shadow-soft">
-                    <p class="text-xs text-slate-500 mb-1">נותר</p>
-                    <p class="font-bold text-primary text-lg" id="totalRemainingDisplay">₪0</p>
-                </div>
-            </div>
 
-            <!-- Budget Categories Grid -->
-            <div id="budgetGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Categories injected by JS -->
-            </div>
-        </section>
+                <!-- Categories -->
+                <div id="budgetGrid" class="space-y-3"></div>
+            </section>
         </div>
 
-        <div id="view-tasks" class="view-section hidden">
-        <!-- Tasks Section -->
-        <section class="animate-slide-up" style="animation-delay: 0.2s;">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">משימות לביצוע</h3>
-            
-            <!-- Add Task Input -->
-            <div class="glass-card p-2 rounded-2xl shadow-sm flex items-center gap-2 mb-4 focus-within:ring-2 focus-within:ring-gold/50 transition-all">
-                <button onclick="addTask()" class="w-10 h-10 bg-gold text-white rounded-xl flex items-center justify-center hover:bg-yellow-600 transition-colors shadow-md">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <input type="text" id="newTaskInput" placeholder="הוסף משימה חדשה..." 
-                    class="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-400 px-2"
-                    onkeypress="if(event.key === 'Enter') addTask()">
-            </div>
-
-            <!-- Task List -->
-            <div id="taskList" class="space-y-3">
-                <!-- Tasks injected by JS -->
-            </div>
-            
-            <!-- Empty State for Tasks -->
-            <div id="emptyTasksState" class="hidden text-center py-10">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400 text-2xl">
-                    <i class="fa-solid fa-clipboard-check"></i>
+        <!-- RABBINATE VIEW -->
+        <div id="view-rabbinate" class="view-section hidden">
+            <section class="animate-slide-up">
+                <h3 class="text-xl font-bold text-dusk mb-4 px-2">הליך ברבנות</h3>
+                <div class="glass p-4 rounded-2xl mb-4">
+                    <p class="text-sm text-dusk/80 leading-relaxed">
+                        <i class="fa-solid fa-circle-info text-sageDark ml-1"></i>
+                        יש לפתוח תיק נישואין בין 45 יום ל-3 חודשים לפני החתונה.
+                    </p>
                 </div>
-                <p class="text-slate-500 font-medium">אין משימות פתוחות.</p>
-                <p class="text-slate-400 text-sm">הוסיפו משימה חדשה כדי להתחיל!</p>
-            </div>
-        </section>
+                <div id="rabbinateList" class="space-y-3"></div>
+            </section>
+        </div>
+
+        <!-- VENDORS VIEW -->
+        <div id="view-vendors" class="view-section hidden">
+            <section class="animate-slide-up">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
+                    <button onclick="app.addVendor()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div id="vendorsList" class="grid grid-cols-1 gap-4"></div>
+            </section>
+        </div>
+
+        <!-- NOTES VIEW -->
+        <div id="view-notes" class="view-section hidden">
+            <section class="animate-slide-up">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="text-xl font-bold text-dusk">לוח השראה</h3>
+                    <button onclick="app.addNote()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div id="notesGrid" class="grid grid-cols-2 gap-4"></div>
+            </section>
         </div>
 
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-t border-white/40 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)] pb-6">
-        <div class="flex justify-around items-center h-20 max-w-3xl mx-auto">
-            <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-gold transition-colors w-16" data-target="home">
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2">
+        <div class="flex justify-around items-center h-16 max-w-3xl mx-auto px-2">
+            <button onclick="app.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="home">
                 <i class="fa-solid fa-house text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">בית</span>
             </button>
-            <button onclick="switchTab('budget')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-colors w-16" data-target="budget">
+            <button onclick="app.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="budget">
                 <i class="fa-solid fa-sack-dollar text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">תקציב</span>
             </button>
-            <button onclick="switchTab('tasks')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-colors w-16" data-target="tasks">
-                <i class="fa-solid fa-clipboard-list text-xl mb-0.5"></i>
-                <span class="text-[10px] font-medium">משימות</span>
+            <button onclick="app.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="rabbinate">
+                <i class="fa-solid fa-scroll text-xl mb-0.5"></i>
+                <span class="text-[10px] font-medium">רבנות</span>
+            </button>
+            <button onclick="app.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="vendors">
+                <i class="fa-solid fa-store text-xl mb-0.5"></i>
+                <span class="text-[10px] font-medium">ספקים</span>
+            </button>
+            <button onclick="app.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="notes">
+                <i class="fa-solid fa-note-sticky text-xl mb-0.5"></i>
+                <span class="text-[10px] font-medium">פתקים</span>
             </button>
         </div>
     </nav>
 
-    <!-- ================= MODALS ================= -->
-
-    <!-- Budget Edit Modal -->
-    <div id="budgetModal" class="fixed inset-0 z-50 hidden">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeBudgetModal()"></div>
-        
-        <!-- Modal Content -->
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col transform transition-transform duration-300 translate-y-full" id="budgetModalContent">
-            
-            <!-- Handle bar -->
-            <div class="w-full flex justify-center pt-3 pb-1" onclick="closeBudgetModal()">
-                <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
-            </div>
-
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-slate-800">ניהול תקציב</h3>
-                <button onclick="closeBudgetModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="overflow-y-auto p-6 space-y-4 flex-1">
-                <!-- Headers -->
-                <div class="grid grid-cols-12 gap-3 text-xs font-semibold text-slate-500 px-1">
-                    <div class="col-span-4">קטגוריה</div>
-                    <div class="col-span-4 text-center">תקציב משוער</div>
-                    <div class="col-span-4 text-center">שולם בפועל</div>
-                </div>
-
-                <!-- Dynamic Rows -->
-                <div id="budgetEditList" class="space-y-3"></div>
-            </div>
-
-            <div class="p-4 border-t border-slate-100 bg-slate-50 safe-area-bottom">
-                <button onclick="closeBudgetModal()" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-95 transition-transform">
-                    שמור וסגור
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeSettingsModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 p-6 animate-slide-up">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">הגדרות חתונה</h3>
+        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="app.closeSettings()"></div>
+        <div class="glass w-full max-w-md rounded-3xl shadow-neumorph relative z-10 p-6 animate-slide-up bg-ivory">
+            <h3 class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">שם החתן</label>
-                    <input type="text" id="groomNameInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label class="block text-sm font-medium text-dusk/70 mb-1">שם החתן</label>
+                    <input type="text" id="groomNameInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">שם הכלה</label>
-                    <input type="text" id="brideNameInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label class="block text-sm font-medium text-dusk/70 mb-1">שם הכלה</label>
+                    <input type="text" id="brideNameInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">תאריך החתונה</label>
-                    <input type="date" id="weddingDateInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label class="block text-sm font-medium text-dusk/70 mb-1">תאריך החתונה</label>
+                    <input type="date" id="weddingDateInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">תקציב כולל (יעד)</label>
-                    <input type="number" id="totalBudgetInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <label class="block text-sm font-medium text-dusk/70 mb-1">תקציב כולל (יעד)</label>
+                    <input type="number" id="totalBudgetInput" class="w-full bg-white/50 border border-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-sage transition-all">
                 </div>
             </div>
 
             <div class="mt-8 flex gap-3">
-                <button onclick="saveSettings()" class="flex-1 bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+                <button onclick="app.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform">
                     שמור שינויים
                 </button>
-                <button onclick="closeSettingsModal()" class="px-6 py-3 rounded-xl text-slate-500 font-medium hover:bg-slate-50">
+                <button onclick="app.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50">
                     ביטול
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- APP LOGIC -->
     <script>
-        // ================= STATE MANAGEMENT =================
-        const DB_KEY = 'wedding_elite_v3_data';
-        
-        const defaultData = {
+        /**
+         * Wedding Elite Premium - Core Architecture
+         * Uses Proxy for reactive state and debounced persistence.
+         */
+
+        const DB_KEY = 'wedding_elite_premium_v1';
+
+        // --- Initial State ---
+        const initialState = {
             totalBudget: 125000,
+            guests: { family: 0, friends: 0, work: 0 },
             couple: {
                 groom: "יוסי",
                 bride: "חן",
                 date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
             },
             budget: [
-                { id: 'venue', name: "אולם ואירוח", icon: "fa-utensils", planned: 80000, actual: 0 },
-                { id: 'photo', name: "צילום", icon: "fa-camera", planned: 12000, actual: 0 },
-                { id: 'dj', name: "מוזיקה ו-DJ", icon: "fa-music", planned: 8000, actual: 0 },
-                { id: 'dress', name: "שמלה ואיפור", icon: "fa-shirt", planned: 10000, actual: 0 },
-                { id: 'suit', name: "חליפת חתן", icon: "fa-user-tie", planned: 3000, actual: 0 },
-                { id: 'ring', name: "טבעות", icon: "fa-ring", planned: 2000, actual: 0 },
-                { id: 'flowers', name: "עיצוב ופרחים", icon: "fa-leaf", planned: 5000, actual: 0 },
-                { id: 'misc', name: "שונות", icon: "fa-star", planned: 5000, actual: 0 }
+                { id: 'venue', name: "אולם ואירוח", icon: "fa-utensils", planned: 80000, actual: 0, paid: 0 },
+                { id: 'photo', name: "צילום", icon: "fa-camera", planned: 12000, actual: 0, paid: 0 },
+                { id: 'dj', name: "מוזיקה", icon: "fa-music", planned: 8000, actual: 0, paid: 0 },
+                { id: 'dress', name: "שמלה ואיפור", icon: "fa-shirt", planned: 10000, actual: 0, paid: 0 }
             ],
-            tasks: [
-                { id: 1, text: "לבחור תאריך לחתונה", done: true },
-                { id: 2, text: "לסגור אולם אירועים", done: false },
-                { id: 3, text: "לשלוח הזמנות לאורחים", done: false },
-                { id: 4, text: "לבחור שיר חופה", done: false }
+            rabbinate: [
+                { id: 1, text: "פתיחת תיק נישואין", done: false },
+                { id: 2, text: "הדרכת כלות", done: false },
+                { id: 3, text: "תעודות רווקות", done: false },
+                { id: 4, text: "אישור מקווה", done: false }
+            ],
+            vendors: [
+                { id: 1, name: "אולמי בראשית", category: "אולם", price: 85000, rating: 5, kosher: true, contract: true },
+                { id: 2, name: "צלם מגנטים", category: "אטרקציות", price: 1500, rating: 4, kosher: false, contract: false }
+            ],
+            notes: [
+                { id: 1, text: "לבדוק עיצוב חופה בסגנון בוהו", color: "bg-yellow-100" },
+                { id: 2, text: "רשימת שירים ל-DJ", color: "bg-purple-100" }
             ]
         };
 
-        let appData = { ...defaultData };
+        // --- Persistence Engine ---
+        const saveToStorage = () => {
+            localStorage.setItem(DB_KEY, JSON.stringify(state));
+        };
+        
+        // Debounce function
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+        
+        const debouncedSave = debounce(saveToStorage, 1000);
 
-        // ================= INITIALIZATION =================
-        function init() {
-            loadData();
-            renderAll();
-            switchTab('home');
-        }
-
-        function loadData() {
-            const saved = localStorage.getItem(DB_KEY);
-            if (saved) {
-                appData = JSON.parse(saved);
-                if (typeof appData.totalBudget === 'undefined') {
-                    appData.totalBudget = 125000;
-                }
-            } else {
-                saveData(); // Save defaults
+        // --- Reactive State Proxy ---
+        const handler = {
+            set(target, property, value) {
+                target[property] = value;
+                debouncedSave();
+                // Trigger UI updates based on what changed
+                if (property === 'budget' || property === 'guests') app.renderBudget();
+                if (property === 'rabbinate') app.renderRabbinate();
+                if (property === 'vendors') app.renderVendors();
+                if (property === 'notes') app.renderNotes();
+                if (property === 'couple') app.renderHero();
+                return true;
             }
-        }
+        };
 
-        function saveData() {
-            localStorage.setItem(DB_KEY, JSON.stringify(appData));
-            renderAll(); // Re-render on save to update totals
-        }
+        // Load or Init
+        let loadedData = JSON.parse(localStorage.getItem(DB_KEY)) || initialState;
+        // Merge with default to ensure new fields exist
+        loadedData = { ...initialState, ...loadedData };
+        
+        const state = new Proxy(loadedData, handler);
 
-        function renderAll() {
-            renderHero();
-            renderBudget();
-            renderTasks();
-        }
+        // --- Application Logic ---
+        const app = {
+            init() {
+                this.renderHero();
+                this.renderBudget();
+                this.renderRabbinate();
+                this.renderVendors();
+                this.renderNotes();
+                this.startTimer();
+                this.navTo('home');
+                
+                // Restore inputs
+                document.getElementById('guestsFamily').value = state.guests.family || '';
+                document.getElementById('guestsFriends').value = state.guests.friends || '';
+                document.getElementById('guestsWork').value = state.guests.work || '';
+                this.calcGifts();
+            },
 
-        // ================= HERO SECTION =================
-        function renderHero() {
-            document.getElementById('coupleNamesDisplay').textContent = `${appData.couple.groom} & ${appData.couple.bride}`;
-            
-            const dateObj = new Date(appData.couple.date);
-            document.getElementById('weddingDateDisplay').textContent = dateObj.toLocaleDateString('he-IL');
-            
-            // Calculate days remaining
-            const today = new Date();
-            const diffTime = dateObj - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            document.getElementById('daysCount').textContent = diffDays > 0 ? diffDays : 0;
+            // --- Navigation ---
+            navTo(tabName) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${tabName}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if(btn.dataset.target === tabName) {
+                        btn.classList.remove('text-dusk/40');
+                        btn.classList.add('text-sageDark', 'scale-110');
+                    } else {
+                        btn.classList.add('text-dusk/40');
+                        btn.classList.remove('text-sageDark', 'scale-110');
+                    }
+                });
+            },
 
-            // Tasks count
-            const activeTasks = appData.tasks.filter(t => !t.done).length;
-            document.getElementById('tasksLeftCount').textContent = activeTasks;
-        }
+            // --- Dashboard & Timer ---
+            renderHero() {
+                document.getElementById('coupleNamesDisplay').textContent = `${state.couple.groom} & ${state.couple.bride}`;
+                document.getElementById('weddingDateDisplay').textContent = new Date(state.couple.date).toLocaleDateString('he-IL');
+            },
 
-        // ================= BUDGET LOGIC =================
-        function renderBudget() {
-            const grid = document.getElementById('budgetGrid');
-            grid.innerHTML = '';
+            startTimer() {
+                const update = () => {
+                    const now = new Date().getTime();
+                    const weddingDate = new Date(state.couple.date).getTime();
+                    const distance = weddingDate - now;
 
-            let totalPlanned = 0;
-            let totalActual = 0;
+                    if (distance < 0) return;
 
-            appData.budget.forEach(cat => {
-                totalPlanned += Number(cat.planned);
-                totalActual += Number(cat.actual);
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                // Calculate percentage for progress bar
-                const percent = cat.planned > 0 ? Math.min(100, Math.round((cat.actual / cat.planned) * 100)) : 0;
-                let progressColor = 'bg-primary';
-                if (percent > 100) progressColor = 'bg-red-500';
-                else if (percent > 80) progressColor = 'bg-orange-400';
+                    document.getElementById('timerDays').innerText = days;
+                    document.getElementById('timerHours').innerText = hours;
+                    document.getElementById('timerMins').innerText = minutes;
+                    document.getElementById('timerSecs').innerText = seconds;
 
-                const card = document.createElement('div');
-                card.className = 'glass-card p-4 rounded-2xl shadow-soft flex flex-col gap-3';
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary text-lg">
+                    // Dynamic Theme Shift
+                    if (days < 30) {
+                        document.documentElement.style.setProperty('--bg-color', '#E6B89C'); // Warm
+                        document.documentElement.style.setProperty('--accent-color', '#D4AF37'); // Gold
+                    }
+
+                    // Radial Progress (Mock calculation based on time passed vs 1 year)
+                    const totalTime = 1000 * 60 * 60 * 24 * 365; 
+                    const progress = Math.min(100, Math.max(0, 100 - (distance / totalTime * 100)));
+                    const offset = 283 - (283 * progress / 100);
+                    document.getElementById('progressCircle').style.strokeDashoffset = offset;
+                    document.getElementById('progressText').innerText = Math.floor(progress) + '%';
+                };
+                setInterval(update, 1000);
+                update();
+            },
+
+            // --- Budget Engine ---
+            calcGifts() {
+                const fam = Number(document.getElementById('guestsFamily').value) || 0;
+                const fri = Number(document.getElementById('guestsFriends').value) || 0;
+                const wrk = Number(document.getElementById('guestsWork').value) || 0;
+                
+                state.guests = { family: fam, friends: fri, work: wrk };
+                
+                const total = (fam * 1500) + (fri * 500) + (wrk * 350);
+                document.getElementById('predictedIncome').innerText = `₪${total.toLocaleString()}`;
+            },
+
+            renderBudget() {
+                const grid = document.getElementById('budgetGrid');
+                grid.innerHTML = '';
+                
+                let totalPaid = 0;
+                
+                state.budget.forEach((cat, idx) => {
+                    totalPaid += Number(cat.paid || 0);
+                    const percent = cat.planned > 0 ? Math.min(100, (cat.paid / cat.planned) * 100) : 0;
+                    
+                    const el = document.createElement('div');
+                    el.className = 'glass p-3 rounded-xl flex items-center gap-3';
+                    el.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-dusk">
                             <i class="fa-solid ${cat.icon}"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-slate-800 text-sm">${cat.name}</h4>
-                            <div class="flex justify-between text-xs mt-0.5">
-                                <span class="text-slate-400">תקציב: ₪${Number(cat.planned).toLocaleString()}</span>
-                                <span class="font-bold ${cat.actual > cat.planned ? 'text-red-500' : 'text-slate-700'}">
-                                    ₪${Number(cat.actual).toLocaleString()}
-                                </span>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-bold text-sm text-dusk">${cat.name}</span>
+                                <span class="text-xs text-dusk/60">₪${cat.paid} / ₪${cat.planned}</span>
+                            </div>
+                            <div class="w-full bg-white/30 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-sage h-full" style="width: ${percent}%"></div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Progress Bar -->
-                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="${progressColor} h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-
-            // Update Summary Cards
-            if (appData.totalBudget === 0) {
-                document.getElementById('totalBudgetDisplay').innerHTML = '<span class="text-sm text-gold flex items-center gap-1"><i class="fa-solid fa-wallet"></i> הגדירו תקציב</span>';
-            } else {
-                document.getElementById('totalBudgetDisplay').textContent = `₪${Number(appData.totalBudget).toLocaleString()}`;
-            }
-            document.getElementById('totalPaidDisplay').textContent = `₪${totalActual.toLocaleString()}`;
-            document.getElementById('totalRemainingDisplay').textContent = `₪${(appData.totalBudget - totalActual).toLocaleString()}`;
-        }
-
-        function openBudgetModal() {
-            const modal = document.getElementById('budgetModal');
-            const content = document.getElementById('budgetModalContent');
-            const list = document.getElementById('budgetEditList');
-            
-            list.innerHTML = '';
-
-            appData.budget.forEach((cat, index) => {
-                const row = document.createElement('div');
-                row.className = 'grid grid-cols-12 gap-3 items-center bg-white';
-                row.innerHTML = `
-                    <!-- Name & Icon -->
-                    <div class="col-span-4 flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 text-xs">
-                            <i class="fa-solid ${cat.icon}"></i>
-                        </div>
-                        <span class="text-sm font-medium text-slate-700 truncate">${cat.name}</span>
-                    </div>
-                    
-                    <!-- Planned Input -->
-                    <div class="col-span-4">
-                        <input type="number" value="${cat.planned}" 
-                            oninput="updateBudgetCategory(${index}, 'planned', this.value)"
-                            class="w-full bg-slate-100 text-slate-600 text-center text-sm font-medium rounded-lg py-2 px-1 outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                    </div>
-
-                    <!-- Actual Input -->
-                    <div class="col-span-4">
-                        <input type="number" value="${cat.actual}" 
-                            oninput="updateBudgetCategory(${index}, 'actual', this.value)"
-                            class="w-full bg-white border border-slate-200 text-slate-900 text-center text-sm font-bold rounded-lg py-2 px-1 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm">
-                    </div>
-                `;
-                list.appendChild(row);
-            });
-
-            modal.classList.remove('hidden');
-            // Small delay for animation
-            setTimeout(() => {
-                content.classList.remove('translate-y-full');
-            }, 10);
-        }
-
-        function closeBudgetModal() {
-            const modal = document.getElementById('budgetModal');
-            const content = document.getElementById('budgetModalContent');
-            
-            content.classList.add('translate-y-full');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        function updateBudgetCategory(index, field, value) {
-            appData.budget[index][field] = Number(value);
-            // We don't save to localStorage on every keystroke to avoid lag, 
-            // but we update the live object. 
-            // The "Save & Close" button triggers the actual persistence, 
-            // OR we can save debounced. For simplicity, we save on close or here.
-            // Let's save immediately for "Instant" requirement.
-            saveData(); 
-        }
-
-        function editTotalBudget() {
-            const current = appData.totalBudget;
-            const input = prompt("הכנס תקציב כולל חדש:", current);
-            if (input !== null && !isNaN(input) && input.trim() !== "") {
-                appData.totalBudget = Number(input);
-                saveData();
-            }
-        }
-
-        // ================= TASKS LOGIC =================
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            const emptyState = document.getElementById('emptyTasksState');
-            
-            list.innerHTML = '';
-
-            if (appData.tasks.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            // Sort: Pending first, then Done
-            const sortedTasks = [...appData.tasks].sort((a, b) => a.done - b.done);
-
-            sortedTasks.forEach(task => {
-                const item = document.createElement('div');
-                item.className = `group flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${task.done ? 'bg-slate-50 border-slate-100' : 'bg-white border-slate-100 shadow-sm hover:shadow-md'}`;
-                
-                item.innerHTML = `
-                    <label class="relative flex items-center cursor-pointer">
-                        <input type="checkbox" class="task-checkbox peer sr-only" 
-                            ${task.done ? 'checked' : ''} 
-                            onchange="toggleTask(${task.id})">
-                        <div class="w-6 h-6 border-2 border-slate-300 rounded-full peer-checked:bg-gold peer-checked:border-gold transition-all flex items-center justify-center text-white text-xs">
-                            <i class="fa-solid fa-check opacity-0 peer-checked:opacity-100"></i>
-                        </div>
-                    </label>
-                    
-                    <div class="flex-1 text-sm font-medium text-slate-700 transition-colors">
-                        ${task.text}
-                    </div>
-
-                    <button onclick="deleteTask(${task.id})" class="text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity px-2">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function addTask() {
-            const input = document.getElementById('newTaskInput');
-            const text = input.value.trim();
-            
-            if (text) {
-                appData.tasks.unshift({
-                    id: Date.now(),
-                    text: text,
-                    done: false
+                        <button onclick="app.editBudgetCat(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
+                    `;
+                    grid.appendChild(el);
                 });
-                input.value = '';
-                saveData();
-            }
-        }
 
-        function toggleTask(id) {
-            const task = appData.tasks.find(t => t.id === id);
-            if (task) {
-                task.done = !task.done;
-                saveData();
+                document.getElementById('totalBudgetDisplay').innerText = `₪${state.totalBudget.toLocaleString()}`;
+                document.getElementById('totalRemainingDisplay').innerText = `₪${(state.totalBudget - totalPaid).toLocaleString()}`;
+            },
+
+            editBudgetCat(idx) {
+                const cat = state.budget[idx];
+                const newPaid = prompt(`כמה שולם עבור ${cat.name}?`, cat.paid);
+                if (newPaid !== null) {
+                    state.budget[idx].paid = Number(newPaid);
+                    // Trigger proxy set
+                    state.budget = [...state.budget];
+                }
+            },
+
+            // --- Rabbinate Navigator ---
+            renderRabbinate() {
+                const list = document.getElementById('rabbinateList');
+                list.innerHTML = '';
                 
-                if (task.done) {
-                    triggerConfetti();
+                state.rabbinate.forEach((task, idx) => {
+                    const el = document.createElement('div');
+                    el.className = `p-4 rounded-xl border transition-all flex items-center gap-3 ${task.done ? 'bg-sage/20 border-sage' : 'bg-white/40 border-white'}`;
+                    el.innerHTML = `
+                        <div onclick="app.toggleRabbinate(${idx})" class="w-6 h-6 rounded-full border-2 border-dusk/20 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : ''}">
+                            ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                        </div>
+                        <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
+                    `;
+                    list.appendChild(el);
+                });
+            },
+
+            toggleRabbinate(idx) {
+                state.rabbinate[idx].done = !state.rabbinate[idx].done;
+                state.rabbinate = [...state.rabbinate]; // Trigger reactivity
+                if (state.rabbinate[idx].done) this.confetti();
+            },
+
+            // --- Vendor CRM ---
+            renderVendors() {
+                const list = document.getElementById('vendorsList');
+                list.innerHTML = '';
+                
+                state.vendors.forEach((v, idx) => {
+                    const stars = '★'.repeat(v.rating) + '☆'.repeat(5 - v.rating);
+                    const el = document.createElement('div');
+                    el.className = 'glass p-4 rounded-2xl relative group';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider text-dusk/50 bg-white/50 px-2 py-0.5 rounded-full">${v.category}</span>
+                                <h4 class="font-bold text-lg text-dusk mt-1">${v.name}</h4>
+                            </div>
+                            <div class="text-gold text-sm tracking-widest">${stars}</div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <span class="text-xs px-2 py-1 rounded-md ${v.kosher ? 'bg-sage/30 text-dusk' : 'bg-red-100 text-red-800'}">
+                                ${v.kosher ? 'כשר' : 'לא כשר'}
+                            </span>
+                            <span class="text-xs px-2 py-1 rounded-md ${v.contract ? 'bg-sage/30 text-dusk' : 'bg-yellow-100 text-yellow-800'}">
+                                ${v.contract ? 'חוזה חתום' : 'אין חוזה'}
+                            </span>
+                        </div>
+                        <button onclick="app.deleteVendor(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    list.appendChild(el);
+                });
+            },
+
+            addVendor() {
+                const name = prompt("שם העסק:");
+                if (!name) return;
+                state.vendors.push({
+                    id: Date.now(),
+                    name: name,
+                    category: "כללי",
+                    price: 0,
+                    rating: 5,
+                    kosher: confirm("האם יש תעודת כשרות?"),
+                    contract: false
+                });
+                state.vendors = [...state.vendors];
+            },
+
+            deleteVendor(idx) {
+                if(confirm("למחוק ספק זה?")) {
+                    state.vendors.splice(idx, 1);
+                    state.vendors = [...state.vendors];
                 }
+            },
+
+            // --- Visual Notes ---
+            renderNotes() {
+                const grid = document.getElementById('notesGrid');
+                grid.innerHTML = '';
+                
+                state.notes.forEach((note, idx) => {
+                    const el = document.createElement('div');
+                    el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
+                    el.innerHTML = `
+                        <p class="text-dusk font-handwriting text-sm leading-relaxed">${note.text}</p>
+                        <button onclick="app.deleteNote(${idx})" class="self-end text-dusk/30 hover:text-dusk"><i class="fa-solid fa-trash-can"></i></button>
+                    `;
+                    grid.appendChild(el);
+                });
+            },
+
+            addNote() {
+                const text = prompt("תוכן הפתק:");
+                if (!text) return;
+                const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                state.notes.push({ id: Date.now(), text, color: randomColor });
+                state.notes = [...state.notes];
+            },
+
+            deleteNote(idx) {
+                state.notes.splice(idx, 1);
+                state.notes = [...state.notes];
+            },
+
+            // --- Settings ---
+            openSettings() {
+                document.getElementById('groomNameInput').value = state.couple.groom;
+                document.getElementById('brideNameInput').value = state.couple.bride;
+                document.getElementById('weddingDateInput').value = state.couple.date;
+                document.getElementById('totalBudgetInput').value = state.totalBudget;
+                document.getElementById('settingsModal').classList.remove('hidden');
+            },
+
+            closeSettings() {
+                document.getElementById('settingsModal').classList.add('hidden');
+            },
+
+            saveSettings() {
+                state.couple.groom = document.getElementById('groomNameInput').value;
+                state.couple.bride = document.getElementById('brideNameInput').value;
+                state.couple.date = document.getElementById('weddingDateInput').value;
+                state.totalBudget = Number(document.getElementById('totalBudgetInput').value);
+                
+                // Force deep update
+                state.couple = { ...state.couple };
+                this.closeSettings();
+            },
+
+            // --- Effects ---
+            confetti() {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#D0E6D2', '#F5F5DC', '#D4AF37']
+                });
             }
-        }
+        };
 
-        function deleteTask(id) {
-            if(confirm('למחוק את המשימה?')) {
-                appData.tasks = appData.tasks.filter(t => t.id !== id);
-                saveData();
-            }
-        }
-
-        function triggerConfetti() {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#6366f1', '#8b5cf6', '#ec4899']
-            });
-        }
-
-        // ================= SETTINGS LOGIC =================
-        function openSettingsModal() {
-            document.getElementById('groomNameInput').value = appData.couple.groom;
-            document.getElementById('brideNameInput').value = appData.couple.bride;
-            document.getElementById('weddingDateInput').value = appData.couple.date;
-            document.getElementById('totalBudgetInput').value = appData.totalBudget;
-            
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        function saveSettings() {
-            appData.couple.groom = document.getElementById('groomNameInput').value;
-            appData.couple.bride = document.getElementById('brideNameInput').value;
-            appData.couple.date = document.getElementById('weddingDateInput').value;
-            appData.totalBudget = Number(document.getElementById('totalBudgetInput').value);
-            
-            saveData();
-            closeSettingsModal();
-        }
-
-        // ================= NAVIGATION LOGIC =================
-        function switchTab(tabName) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            // Show target
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            
-            // Update nav
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === tabName) {
-                    btn.classList.remove('text-slate-400');
-                    btn.classList.add('text-gold');
-                } else {
-                    btn.classList.add('text-slate-400');
-                    btn.classList.remove('text-gold');
-                }
-            });
-        }
-
-        // Run Init
-        init();
+        // Start
+        app.init();
 
     </script>
 </body>
