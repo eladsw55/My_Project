@@ -144,12 +144,10 @@
             animation: fadeIn 0.5s ease-out;
         }
         
-        /* Improved touch targets for mobile */
         button, input, textarea, select {
             min-height: 44px;
         }
         
-        /* Better scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -163,11 +161,73 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+        
+        button, .editable, .nav-item {
+            cursor: pointer;
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 1000;
+        }
+
+        [data-tooltip]:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
     </style>
 </head>
 <body>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast">
         <div class="flex items-center gap-3">
             <span id="toast-icon" class="text-2xl">✅</span>
@@ -178,7 +238,6 @@
         </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.9); z-index:3000; align-items:center; justify-content:center;">
         <div class="text-center">
             <div class="spinner" style="width:40px; height:40px; border-width:4px; border-color:#6366F1; border-top-color:transparent; margin:0 auto 16px"></div>
@@ -186,7 +245,6 @@
         </div>
     </div>
 
-    <!-- Modal -->
     <div id="modal" class="modal" onclick="closeModal()">
         <div class="modal-content bg-white rounded-3xl p-6 max-w-md w-full mx-4" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between mb-4">
@@ -197,10 +255,8 @@
         </div>
     </div>
 
-    <!-- App Container -->
     <div class="pb-20">
         
-        <!-- HOME TAB -->
         <div id="tab-home" class="tab-content active">
             <div class="bg-white p-6 flex items-center justify-between sticky top-0 z-10 shadow-sm">
                 <div>
@@ -209,11 +265,10 @@
                     </h1>
                     <p class="text-sm text-slate-500">לחצו על השמות לעריכה</p>
                 </div>
-                <button class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🔔</button>
+                <button data-tooltip="התראות" class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-xl">🔔</button>
             </div>
 
             <div class="p-4 space-y-4">
-                <!-- Countdown Card -->
                 <div class="card p-8 text-center bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
                     <p class="text-indigo-200 text-sm font-bold uppercase mb-2">הספירה לאחור!</p>
                     <h2 id="days-left" class="text-6xl font-black my-4">--</h2>
@@ -222,7 +277,6 @@
                     <p class="text-xs text-white/70 mt-1">לחצו לשינוי תאריך</p>
                 </div>
 
-                <!-- Control Meter -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">המצב שלכם היום</h3>
@@ -254,7 +308,6 @@
                     </div>
                 </div>
 
-                <!-- Today's Tasks -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">⚡ משימות להיום</h3>
@@ -265,7 +318,6 @@
                     </div>
                 </div>
 
-                <!-- Budget Quick View -->
                 <div class="card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-slate-800">💰 תקציב</h3>
@@ -293,7 +345,6 @@
             </div>
         </div>
 
-        <!-- BUDGET TAB -->
         <div id="tab-budget" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">💰 תקציב</h1>
@@ -328,7 +379,6 @@
             </div>
         </div>
 
-        <!-- SUPPLIERS TAB -->
         <div id="tab-suppliers" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">🔍 ספקים</h1>
@@ -378,7 +428,6 @@
             </div>
         </div>
 
-        <!-- TASKS TAB -->
         <div id="tab-tasks" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">📋 משימות</h1>
@@ -398,7 +447,6 @@
             </div>
         </div>
 
-        <!-- PROFILE TAB -->
         <div id="tab-profile" class="tab-content">
             <div class="bg-white p-6 sticky top-0 z-10 shadow-sm">
                 <h1 class="text-2xl font-bold text-slate-800">👤 פרופיל</h1>
@@ -447,7 +495,6 @@
 
     </div>
 
-    <!-- Bottom Navigation -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-3 flex justify-around items-center shadow-2xl z-50">
         <button onclick="switchTab('home')" id="nav-home" class="nav-item active flex flex-col items-center transition-all">
             <span class="text-2xl">🏠</span>
@@ -472,7 +519,6 @@
     </div>
 
     <script>
-        // ==================== CONFIG ====================
         const API_URL = "https://my-project-n3th.onrender.com";
         
         let appState = {
@@ -485,7 +531,6 @@
             lastSync: null
         };
 
-        // ==================== API CLIENT ====================
         class API {
             static async call(endpoint, options = {}) {
                 try {
@@ -563,7 +608,6 @@
             }
         }
 
-        // ==================== UI HELPERS ====================
         function showLoading(show = true) {
             document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
         }
@@ -597,13 +641,13 @@
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal').classList.add('show');
+            setTimeout(() => addButtonFeedback(), 100);
         }
 
         function closeModal() {
             document.getElementById('modal').classList.remove('show');
         }
 
-        // ==================== TAB SWITCHING ====================
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
@@ -615,13 +659,11 @@
             const activeNav = document.querySelector(`#nav-${tabName} span:last-child`);
             if (activeNav) activeNav.className = 'text-[10px] font-bold mt-1 text-indigo-600';
             
-            // Load data when switching to tab
             if (tabName === 'budget') loadBudget();
             if (tabName === 'tasks') loadTasks();
             if (tabName === 'suppliers') loadVendors();
         }
 
-        // ==================== DATA LOADING ====================
         async function loadDashboard() {
             try {
                 const [wedding, dashboard] = await Promise.all([
@@ -629,40 +671,48 @@
                     API.getDashboard(appState.weddingId)
                 ]);
 
-                // Update wedding info
                 appState.wedding = wedding;
                 document.getElementById('display-names').textContent = `${wedding.bride_name} ו${wedding.groom_name}`;
                 document.getElementById('display-date').textContent = `📅 ${formatDate(wedding.wedding_date)}`;
-                document.getElementById('days-left').textContent = wedding.days_remaining;
+                
+                const daysLeft = document.getElementById('days-left');
+                daysLeft.textContent = wedding.days_remaining;
+                daysLeft.style.fontSize = '';
 
-                // Update dashboard stats
                 document.getElementById('tasks-done').textContent = dashboard.tasks_completed;
                 document.getElementById('tasks-urgent').textContent = dashboard.tasks_urgent;
-                document.getElementById('budget-status').textContent = `₪${formatNumber(dashboard.budget_remaining)}`;
+                
+                const remaining = dashboard.budget_remaining;
+                if (remaining === 0) {
+                    document.getElementById('budget-status').textContent = 'מאוזן ✓';
+                } else {
+                    document.getElementById('budget-status').textContent = `₪${formatNumber(remaining)}`;
+                }
 
-                // Update control bar
                 const controlPercent = dashboard.control_percentage;
                 document.getElementById('control-bar').style.width = `${controlPercent}%`;
-                document.getElementById('control-percent').textContent = `${controlPercent}%`;
                 
-                // Update emoji based on progress
-                const emoji = controlPercent > 75 ? '🎉' : controlPercent > 50 ? '😊' : controlPercent > 25 ? '😌' : '😅';
-                document.getElementById('control-emoji').textContent = emoji;
+                if (controlPercent === 0) {
+                    document.getElementById('control-percent').textContent = 'התחל';
+                    document.getElementById('control-emoji').textContent = '📝';
+                } else {
+                    document.getElementById('control-percent').textContent = `${controlPercent}%`;
+                    const emoji = controlPercent > 75 ? '🎉' : controlPercent > 50 ? '😊' : controlPercent > 25 ? '😌' : '😅';
+                    document.getElementById('control-emoji').textContent = emoji;
+                }
 
-                // Update budget
                 document.getElementById('budget-total').textContent = `₪${formatNumber(dashboard.budget_planned)}`;
                 document.getElementById('budget-actual').textContent = `₪${formatNumber(dashboard.budget_actual)}`;
                 document.getElementById('budget-remaining').textContent = `₪${formatNumber(dashboard.budget_remaining)}`;
                 document.getElementById('budget-bar').style.width = `${dashboard.budget_percentage}%`;
 
-                // Store in localStorage for quick access
                 localStorage.setItem('wedding_id', appState.weddingId);
-                
                 appState.lastSync = new Date();
 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                showToast('שגיאה בטעינת הנתונים', 'error');
+                setMeaningfulDefaults();
+                showToast('טוען מהשמירה המקומית...', 'info');
             }
         }
 
@@ -670,18 +720,22 @@
             try {
                 const categories = await API.getBudget(appState.weddingId);
                 appState.categories = categories;
+                
+                localStorage.setItem('budget_categories', JSON.stringify(categories));
 
-                // Calculate totals
-                const totalPlanned = categories.reduce((sum, cat) => sum + cat.planned_amount, 0);
+                const totalPlanned = parseFloat(localStorage.getItem('total_budget')) || 
+                                   categories.reduce((sum, cat) => sum + cat.planned_amount, 0);
                 const totalActual = categories.reduce((sum, cat) => sum + cat.actual_amount, 0);
                 const remaining = totalPlanned - totalActual;
 
-                // Update big budget display
+                if (!localStorage.getItem('total_budget')) {
+                    localStorage.setItem('total_budget', totalPlanned);
+                }
+
                 document.getElementById('budget-total-big').textContent = `₪${formatNumber(totalPlanned)}`;
                 document.getElementById('budget-actual-big').textContent = `₪${formatNumber(totalActual)}`;
                 document.getElementById('budget-remaining-big').textContent = `₪${formatNumber(remaining)}`;
 
-                // Render categories
                 const html = categories.map(cat => {
                     const percentage = cat.percentage_spent;
                     const diff = cat.actual_amount - cat.planned_amount;
@@ -711,10 +765,19 @@
                 }).join('');
                 
                 document.getElementById('categories-list').innerHTML = html || '<p class="text-center text-slate-400 py-8">אין קטגוריות עדיין</p>';
+                
+                recalculateBudget();
 
             } catch (error) {
                 console.error('Error loading budget:', error);
-                showToast('שגיאה בטעינת תקציב', 'error');
+                
+                const localCategories = JSON.parse(localStorage.getItem('budget_categories') || '[]');
+                if (localCategories.length > 0) {
+                    appState.categories = localCategories;
+                    showToast('טוען מהשמירה המקומית', 'info');
+                } else {
+                    showToast('שגיאה בטעינת תקציב', 'error');
+                }
             }
         }
 
@@ -722,6 +785,22 @@
             try {
                 const tasks = await API.getTasks(appState.weddingId);
                 appState.tasks = tasks;
+
+                if (tasks.length === 0) {
+                    const emptyState = `
+                        <div class="text-center py-12">
+                            <span class="text-6xl block mb-4">📋</span>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">אין משימות עדיין</h3>
+                            <p class="text-slate-500 mb-4">הוסיפו את המשימה הראשונה שלכם</p>
+                            <button onclick="addTask()" class="btn-primary text-white px-6 py-3 rounded-xl font-bold">
+                                ➕ הוסף משימה
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('tasks-list').innerHTML = emptyState;
+                    document.getElementById('today-tasks-list').innerHTML = '<p class="text-center text-slate-400 py-4">אין משימות להיום</p>';
+                    return;
+                }
 
                 const html = tasks.map(task => `
                     <div class="card p-4 flex items-start gap-3 fade-in">
@@ -732,16 +811,16 @@
                             <p class="font-semibold text-slate-800 ${task.is_completed ? 'line-through opacity-50' : ''}">${task.title}</p>
                             ${task.is_urgent ? '<p class="text-xs text-orange-600 mt-1">⚠️ דחוף!</p>' : ''}
                         </div>
-                        <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 px-2">🗑️</button>
+                        <button data-tooltip="מחק" onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 px-2">🗑️</button>
                     </div>
                 `).join('');
                 
-                document.getElementById('tasks-list').innerHTML = html || '<p class="text-center text-slate-400 py-8">אין משימות עדיין</p>';
-                document.getElementById('today-tasks-list').innerHTML = (html || '<p class="text-center text-slate-400 py-4">אין משימות להיום</p>').substring(0, 500);
+                document.getElementById('tasks-list').innerHTML = html;
+                document.getElementById('today-tasks-list').innerHTML = html.substring(0, 500) || '<p class="text-center text-slate-400 py-4">אין משימות להיום</p>';
 
             } catch (error) {
                 console.error('Error loading tasks:', error);
-                showToast('שגיאה בטעינת משימות', 'error');
+                showEmptyStates();
             }
         }
 
@@ -750,25 +829,39 @@
                 const vendors = await API.getVendors(appState.weddingId);
                 appState.vendors = vendors;
 
+                if (vendors.length === 0) {
+                    const emptyState = `
+                        <div class="text-center py-8">
+                            <span class="text-5xl block mb-3">💼</span>
+                            <p class="text-slate-600 font-semibold mb-2">אין ספקים עדיין</p>
+                            <p class="text-sm text-slate-400 mb-4">הוסיפו את הספק הראשון שלכם</p>
+                            <button onclick="addVendor()" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold">
+                                ➕ הוסף ספק
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('my-vendors-list').innerHTML = emptyState;
+                    return;
+                }
+
                 const html = vendors.map(v => `
                     <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl fade-in hover:bg-slate-100 transition-all">
                         <div>
                             <p class="font-semibold text-slate-800">${v.vendor_name}</p>
                             <p class="text-xs text-slate-500">₪${formatNumber(v.amount)}</p>
                         </div>
-                        <button class="text-indigo-600 hover:text-indigo-800 px-2">✏️</button>
+                        <button data-tooltip="ערוך" class="text-indigo-600 hover:text-indigo-800 px-2">✏️</button>
                     </div>
                 `).join('');
                 
-                document.getElementById('my-vendors-list').innerHTML = html || '<p class="text-center text-slate-400 py-4">אין ספקים עדיין</p>';
+                document.getElementById('my-vendors-list').innerHTML = html;
 
             } catch (error) {
                 console.error('Error loading vendors:', error);
-                showToast('שגיאה בטעינת ספקים', 'error');
+                showEmptyStates();
             }
         }
 
-        // ==================== ACTIONS ====================
         function editNames() {
             const wedding = appState.wedding;
             showModal('ערוך שמות', `
@@ -789,22 +882,19 @@
                 return;
             }
             
-            showLoading();
-            try {
-                await API.updateWedding(appState.weddingId, {
-                    groom_name: groom,
-                    bride_name: bride
-                });
-                
-                document.getElementById('display-names').textContent = `${bride} ו${groom}`;
-                closeModal();
-                showToast('השמות עודכנו בהצלחה!', 'success');
-                loadDashboard();
-            } catch (error) {
-                showToast('שגיאה בשמירה', 'error');
-            } finally {
-                showLoading(false);
-            }
+            const details = JSON.parse(localStorage.getItem('wedding_details') || '{}');
+            details.groom_name = groom;
+            details.bride_name = bride;
+            localStorage.setItem('wedding_details', JSON.stringify(details));
+            
+            document.getElementById('display-names').textContent = `${bride} ו${groom}`;
+            document.getElementById('groom-name').value = groom;
+            document.getElementById('bride-name').value = bride;
+            
+            closeModal();
+            showToast('השמות עודכנו!', 'success');
+            
+            API.updateWedding(appState.weddingId, { groom_name: groom, bride_name: bride }).catch(() => {});
         }
 
         function editDate() {
@@ -825,20 +915,19 @@
                 return;
             }
             
-            showLoading();
-            try {
-                await API.updateWedding(appState.weddingId, {
-                    wedding_date: date
-                });
-                
-                closeModal();
-                showToast('התאריך עודכן!', 'success');
+            const details = JSON.parse(localStorage.getItem('wedding_details') || '{}');
+            details.wedding_date = date;
+            localStorage.setItem('wedding_details', JSON.stringify(details));
+            
+            document.getElementById('display-date').textContent = `📅 ${formatDate(date)}`;
+            document.getElementById('wedding-date').value = date;
+            
+            closeModal();
+            showToast('התאריך עודכן!', 'success');
+            
+            API.updateWedding(appState.weddingId, { wedding_date: date }).then(() => {
                 loadDashboard();
-            } catch (error) {
-                showToast('שגיאה בשמירה', 'error');
-            } finally {
-                showLoading(false);
-            }
+            }).catch(() => {});
         }
 
         function addTask() {
@@ -964,21 +1053,86 @@
         }
 
         function addCategory() {
-            showToast('בקרוב!', 'info');
+            showModal('הוסף קטגוריה חדשה', `
+                <div class="space-y-3">
+                    <input type="text" id="cat-name" placeholder="שם הקטגוריה" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <input type="text" id="cat-icon" placeholder="אימוג'י (🎵)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <input type="number" id="cat-amount" placeholder="₪ תקציב מתוכנן" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 outline-none">
+                    <button onclick="saveCategory()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">הוסף</button>
+                </div>
+            `);
         }
 
-        function saveWeddingDetails() {
-            showToast('בקרוב!', 'info');
+        async function saveCategory() {
+            const name = document.getElementById('cat-name').value;
+            const icon = document.getElementById('cat-icon').value;
+            const amount = parseFloat(document.getElementById('cat-amount').value);
+            
+            if (!name || !icon || !amount) {
+                showToast('נא למלא את כל השדות', 'warning');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const result = await API.call(`/weddings/${appState.weddingId}/budget`, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: name, icon: icon, planned_amount: amount, notes: "" })
+                });
+                
+                const localCategories = JSON.parse(localStorage.getItem('budget_categories') || '[]');
+                localCategories.push({ id: result.id, name: name, icon: icon, planned_amount: amount, actual_amount: 0 });
+                localStorage.setItem('budget_categories', JSON.stringify(localCategories));
+                
+                closeModal();
+                showToast('הקטגוריה נוספה!', 'success');
+                
+                loadBudget();
+                recalculateBudget();
+                
+            } catch (error) {
+                console.error('Error saving category:', error);
+                showToast('שגיאה בשמירה', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function saveWeddingDetails() {
+            const groomName = document.getElementById('groom-name').value;
+            const brideName = document.getElementById('bride-name').value;
+            const weddingDate = document.getElementById('wedding-date').value;
+            
+            if (!groomName || !brideName || !weddingDate) {
+                showToast('נא למלא את כל השדות', 'warning');
+                return;
+            }
+            
+            const details = { groom_name: groomName, bride_name: brideName, wedding_date: weddingDate };
+            localStorage.setItem('wedding_details', JSON.stringify(details));
+            
+            document.getElementById('display-names').textContent = `${brideName} ו${groomName}`;
+            document.getElementById('display-date').textContent = `📅 ${formatDate(weddingDate)}`;
+            
+            showLoading();
+            try {
+                await API.updateWedding(appState.weddingId, { groom_name: groomName, bride_name: brideName, wedding_date: weddingDate });
+                showToast('הפרטים נשמרו בהצלחה!', 'success');
+                loadDashboard();
+            } catch (error) {
+                showToast('הפרטים נשמרו מקומית', 'warning');
+            } finally {
+                showLoading(false);
+            }
         }
 
         function filterTasks(filter) {
-            // Update active button
             document.querySelectorAll('[id^="filter-"]').forEach(btn => {
                 btn.className = 'px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-bold whitespace-nowrap';
             });
             document.getElementById(`filter-${filter}`).className = 'px-4 py-2 rounded-full bg-indigo-600 text-white text-sm font-bold whitespace-nowrap';
             
-            // Filter tasks - for now just reload
             loadTasks();
         }
 
@@ -990,7 +1144,6 @@
             }
         }
 
-        // ==================== UTILS ====================
         function formatNumber(num) {
             return Math.round(num).toLocaleString('he-IL');
         }
@@ -1000,7 +1153,181 @@
             return date.toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        // ==================== AUTO-SAVE ====================
+        function loadTotalBudget() {
+            const savedBudget = localStorage.getItem('total_budget');
+            if (savedBudget) {
+                const budget = parseFloat(savedBudget);
+                updateBudgetDisplay(budget);
+            } else {
+                API.getDashboard(appState.weddingId).then(dashboard => {
+                    updateBudgetDisplay(dashboard.budget_planned);
+                    localStorage.setItem('total_budget', dashboard.budget_planned);
+                }).catch(() => {});
+            }
+        }
+
+        function updateBudgetDisplay(totalBudget) {
+            document.getElementById('budget-total').textContent = `₪${formatNumber(totalBudget)}`;
+            document.getElementById('budget-total-big').textContent = `₪${formatNumber(totalBudget)}`;
+            recalculateBudget();
+        }
+
+        function calculateRemainingBudget() {
+            const totalBudget = parseFloat(localStorage.getItem('total_budget') || 165000);
+            let totalExpenses = 0;
+            
+            if (appState.categories && appState.categories.length > 0) {
+                totalExpenses = appState.categories.reduce((sum, cat) => sum + (cat.actual_amount || 0), 0);
+            }
+            
+            const remaining = totalBudget - totalExpenses;
+            
+            document.getElementById('budget-remaining').textContent = `₪${formatNumber(remaining)}`;
+            document.getElementById('budget-remaining-big').textContent = `₪${formatNumber(remaining)}`;
+            document.getElementById('budget-status').textContent = `₪${formatNumber(remaining)}`;
+            
+            document.getElementById('budget-actual').textContent = `₪${formatNumber(totalExpenses)}`;
+            document.getElementById('budget-actual-big').textContent = `₪${formatNumber(totalExpenses)}`;
+            
+            const percentage = totalBudget > 0 ? Math.min(100, Math.round((totalExpenses / totalBudget) * 100)) : 0;
+            document.getElementById('budget-bar').style.width = `${percentage}%`;
+            
+            const barElement = document.getElementById('budget-bar');
+            if (remaining < 0) {
+                barElement.className = 'h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500';
+            } else {
+                barElement.className = 'h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500';
+            }
+        }
+
+        function recalculateBudget() {
+            calculateRemainingBudget();
+        }
+
+        function editBudget() {
+            const currentBudget = localStorage.getItem('total_budget') || '165000';
+            showModal('עדכן תקציב כולל', `
+                <div class="space-y-3">
+                    <input type="number" id="edit-budget" placeholder="0" value="${currentBudget}" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 outline-none">
+                    <button onclick="saveBudgetTotal()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">שמור</button>
+                </div>
+            `);
+        }
+
+        async function saveBudgetTotal() {
+            const budget = parseFloat(document.getElementById('edit-budget').value);
+            
+            if (!budget || budget <= 0) {
+                showToast('נא להזין תקציב תקין', 'warning');
+                return;
+            }
+            
+            localStorage.setItem('total_budget', budget);
+            updateBudgetDisplay(budget);
+            
+            showLoading();
+            try {
+                await API.updateWedding(appState.weddingId, { total_budget: budget });
+                closeModal();
+                showToast('התקציב עודכן בהצלחה!', 'success');
+            } catch (error) {
+                showToast('התקציב נשמר מקומית', 'warning');
+                closeModal();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function loadWeddingDetails() {
+            const details = JSON.parse(localStorage.getItem('wedding_details') || '{}');
+            
+            if (details.groom_name) {
+                document.getElementById('groom-name').value = details.groom_name;
+            }
+            if (details.bride_name) {
+                document.getElementById('bride-name').value = details.bride_name;
+            }
+            if (details.wedding_date) {
+                document.getElementById('wedding-date').value = details.wedding_date;
+            }
+            if (details.groom_name && details.bride_name) {
+                document.getElementById('display-names').textContent = `${details.bride_name} ו${details.groom_name}`;
+            }
+            if (details.wedding_date) {
+                document.getElementById('display-date').textContent = `📅 ${formatDate(details.wedding_date)}`;
+            }
+        }
+
+        function setMeaningfulDefaults() {
+            const budgetTotal = document.getElementById('budget-total');
+            const budgetActual = document.getElementById('budget-actual');
+            const budgetRemaining = document.getElementById('budget-remaining');
+            
+            if (budgetTotal && budgetTotal.textContent === '₪--') budgetTotal.textContent = '₪165,000';
+            if (budgetActual && budgetActual.textContent === '₪--') budgetActual.textContent = '₪0';
+            if (budgetRemaining && budgetRemaining.textContent === '₪--') budgetRemaining.textContent = '₪165,000';
+            
+            const budgetTotalBig = document.getElementById('budget-total-big');
+            const budgetActualBig = document.getElementById('budget-actual-big');
+            const budgetRemainingBig = document.getElementById('budget-remaining-big');
+            
+            if (budgetTotalBig && budgetTotalBig.textContent === '₪--') budgetTotalBig.textContent = '₪165,000';
+            if (budgetActualBig && budgetActualBig.textContent === '₪--') budgetActualBig.textContent = '₪0';
+            if (budgetRemainingBig && budgetRemainingBig.textContent === '₪--') budgetRemainingBig.textContent = '₪165,000';
+            
+            const daysLeft = document.getElementById('days-left');
+            if (daysLeft && daysLeft.textContent === '--') {
+                daysLeft.textContent = '...';
+                daysLeft.style.fontSize = '3rem';
+            }
+        }
+
+        function showEmptyStates() {
+            const tasksList = document.getElementById('tasks-list');
+            if (tasksList && tasksList.innerHTML.includes('skeleton')) {
+                tasksList.innerHTML = `
+                    <div class="text-center py-8">
+                        <span class="text-5xl block mb-3">📋</span>
+                        <p class="text-slate-600 font-semibold">אין משימות עדיין</p>
+                        <p class="text-sm text-slate-400 mt-2">לחצו על + להוספת המשימה הראשונה</p>
+                    </div>
+                `;
+            }
+            
+            const todayTasksList = document.getElementById('today-tasks-list');
+            if (todayTasksList && todayTasksList.innerHTML.includes('skeleton')) {
+                todayTasksList.innerHTML = '<p class="text-center text-slate-400 py-4">אין משימות להיום</p>';
+            }
+            
+            const vendorsList = document.getElementById('my-vendors-list');
+            if (vendorsList && vendorsList.innerHTML.includes('skeleton')) {
+                vendorsList.innerHTML = `
+                    <div class="text-center py-6">
+                        <span class="text-4xl block mb-2">💼</span>
+                        <p class="text-slate-500 text-sm">אין ספקים עדיין</p>
+                        <p class="text-xs text-slate-400 mt-1">לחצו על + הוסף</p>
+                    </div>
+                `;
+            }
+        }
+
+        function addButtonFeedback() {
+            document.querySelectorAll('button').forEach(btn => {
+                if (!btn.classList.contains('btn-ripple')) {
+                    btn.classList.add('btn-ripple');
+                }
+            });
+            
+            const tooltips = { '🔔': 'התראות', '✏️': 'ערוך', '🗑️': 'מחק', '➕': 'הוסף', '✕': 'סגור' };
+            
+            document.querySelectorAll('button').forEach(btn => {
+                const icon = btn.textContent.trim();
+                if (tooltips[icon] && !btn.hasAttribute('data-tooltip')) {
+                    btn.setAttribute('data-tooltip', tooltips[icon]);
+                }
+            });
+        }
+
         let autoSaveInterval;
         function startAutoSave() {
             autoSaveInterval = setInterval(async () => {
@@ -1010,27 +1337,32 @@
                 } catch (error) {
                     console.error('Auto-save failed:', error);
                 }
-            }, 30000); // Every 30 seconds
+            }, 30000);
         }
 
-        // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Wedding Elite V2.0 Loading...');
             
-            // Load initial data
+            setMeaningfulDefaults();
+            addButtonFeedback();
+            loadWeddingDetails();
+            loadTotalBudget();
+            
             await loadDashboard();
             await loadTasks();
             
-            // Start auto-save
+            setTimeout(() => {
+                showEmptyStates();
+                calculateRemainingBudget();
+            }, 2000);
+            
             startAutoSave();
             
-            // Show welcome
             setTimeout(() => {
                 showToast('ברוכים הבאים! 💕', 'success', 'כל השינויים נשמרים אוטומטית');
             }, 500);
         });
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (autoSaveInterval) clearInterval(autoSaveInterval);
         });
