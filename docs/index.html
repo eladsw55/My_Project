@@ -25,13 +25,13 @@
                     colors: {
                         ivory: '#F5F5DC',
                         sage: '#D0E6D2',
-                        sageDark: '#A4C4A8',
+                        sageDark: '#8FBC94',
                         dusk: '#4C5578',
                         gold: '#D4AF37',
                         warm: '#E6B89C', // For dynamic shift
                     },
                     boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(76, 85, 120, 0.1)',
+                        'glass': '0 8px 32px 0 rgba(76, 85, 120, 0.07)',
                         'neumorph': '20px 20px 60px #d1d1bb, -20px -20px 60px #ffffff'
                     }
                 }
@@ -42,27 +42,37 @@
     <style>
         :root {
             --bg-color: #F5F5DC;
-            --accent-color: #D0E6D2;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #4C5578;
+        }
+
+        /* Dynamic Theme: Warm/Festive Mode */
+        body.theme-festive {
+            --bg-color: #F0E6D2; /* Warmer Ivory */
+        }
+        body.theme-festive .accent-target {
+            color: #D4AF37 !important; /* Gold override */
         }
 
         body {
             background-color: var(--bg-color);
-            color: #4C5578;
+            color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
-            transition: background-color 1s ease;
+            transition: background-color 1.5s ease;
         }
         
         /* Premium Glassmorphism */
         .glass {
-            background: rgba(255, 255, 255, 0.65);
+            background: var(--glass-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px 0 rgba(76, 85, 120, 0.05);
         }
 
         .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.5);
         }
@@ -104,7 +114,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 glass transition-all-300">
         <div class="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm">
+                <div class="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-dusk shadow-sm accent-target transition-colors duration-1000">
                     <i class="fa-solid fa-ring"></i>
                 </div>
                 <div>
@@ -112,7 +122,7 @@
                     <p class="text-[10px] text-dusk/60 font-medium tracking-widest uppercase">Premium Planner</p>
                 </div>
             </div>
-            <button onclick="app.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors">
+            <button onclick="App.openSettings()" class="w-10 h-10 rounded-full bg-white/50 hover:bg-white flex items-center justify-center text-dusk transition-colors">
                 <i class="fa-solid fa-gear"></i>
             </button>
         </div>
@@ -136,7 +146,7 @@
                     <div class="relative w-16 h-16">
                         <svg class="w-full h-full radial-progress" viewBox="0 0 100 100">
                             <circle class="text-dusk/10 stroke-current" stroke-width="8" cx="50" cy="50" r="45" fill="transparent"></circle>
-                            <circle id="progressCircle" class="text-sage stroke-current radial-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dashoffset="283"></circle>
+                            <circle id="progressCircle" class="text-sage stroke-current radial-circle accent-target" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="45" fill="transparent" stroke-dashoffset="283"></circle>
                         </svg>
                         <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold text-dusk">
                             <span id="progressText">0%</span>
@@ -167,11 +177,11 @@
 
             <!-- Quick Actions Grid -->
             <div class="grid grid-cols-2 gap-4 mt-6 animate-slide-up" style="animation-delay: 0.1s;">
-                <div onclick="app.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32">
+                <div onclick="App.navTo('rabbinate')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32 group">
                     <i class="fa-solid fa-scroll text-2xl text-dusk/80"></i>
                     <span class="font-medium text-sm">הרבנות</span>
                 </div>
-                <div onclick="app.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32">
+                <div onclick="App.navTo('vendors')" class="glass p-4 rounded-2xl cursor-pointer hover:bg-white/60 transition-colors flex flex-col items-center justify-center gap-2 h-32 group">
                     <i class="fa-solid fa-store text-2xl text-dusk/80"></i>
                     <span class="font-medium text-sm">ספקים</span>
                 </div>
@@ -191,15 +201,15 @@
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">משפחה (₪1500)</label>
-                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                            <input type="number" id="guestsFamily" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
                         </div>
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">חברים (₪500)</label>
-                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                            <input type="number" id="guestsFriends" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
                         </div>
                         <div>
                             <label class="text-[10px] text-dusk/60 block mb-1">עבודה (₪350)</label>
-                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="app.calcGifts()">
+                            <input type="number" id="guestsWork" placeholder="0" class="w-full bg-white/50 rounded-lg p-2 text-center text-sm outline-none focus:ring-1 focus:ring-sage" oninput="Budget.calcGifts()">
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t border-dusk/10 flex justify-between items-center">
@@ -244,7 +254,7 @@
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
                     <h3 class="text-xl font-bold text-dusk">ספקים וחוזים</h3>
-                    <button onclick="app.addVendor()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="Vendors.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm hover:bg-sageDark transition-colors"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="vendorsList" class="grid grid-cols-1 gap-4"></div>
             </section>
@@ -255,7 +265,7 @@
             <section class="animate-slide-up">
                 <div class="flex justify-between items-center mb-4 px-2">
                     <h3 class="text-xl font-bold text-dusk">לוח השראה</h3>
-                    <button onclick="app.addNote()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="Notes.add()" class="w-8 h-8 bg-sage rounded-full text-white flex items-center justify-center shadow-sm hover:bg-sageDark transition-colors"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div id="notesGrid" class="grid grid-cols-2 gap-4"></div>
             </section>
@@ -266,23 +276,23 @@
     <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav pb-6 pt-2">
         <div class="flex justify-around items-center h-16 max-w-3xl mx-auto px-2">
-            <button onclick="app.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="home">
+            <button onclick="App.navTo('home')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="home">
                 <i class="fa-solid fa-house text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">בית</span>
             </button>
-            <button onclick="app.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="budget">
+            <button onclick="App.navTo('budget')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="budget">
                 <i class="fa-solid fa-sack-dollar text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">תקציב</span>
             </button>
-            <button onclick="app.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="rabbinate">
+            <button onclick="App.navTo('rabbinate')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="rabbinate">
                 <i class="fa-solid fa-scroll text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">רבנות</span>
             </button>
-            <button onclick="app.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="vendors">
+            <button onclick="App.navTo('vendors')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="vendors">
                 <i class="fa-solid fa-store text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">ספקים</span>
             </button>
-            <button onclick="app.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="notes">
+            <button onclick="App.navTo('notes')" class="nav-btn flex flex-col items-center gap-1 text-dusk/40 transition-colors w-14" data-target="notes">
                 <i class="fa-solid fa-note-sticky text-xl mb-0.5"></i>
                 <span class="text-[10px] font-medium">פתקים</span>
             </button>
@@ -291,7 +301,7 @@
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="app.closeSettings()"></div>
+        <div class="absolute inset-0 bg-dusk/20 backdrop-blur-sm" onclick="App.closeSettings()"></div>
         <div class="glass w-full max-w-md rounded-3xl shadow-neumorph relative z-10 p-6 animate-slide-up bg-ivory">
             <h3 class="text-xl font-bold text-dusk mb-6">הגדרות חתונה</h3>
             
@@ -315,10 +325,10 @@
             </div>
 
             <div class="mt-8 flex gap-3">
-                <button onclick="app.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform">
+                <button onclick="App.saveSettings()" class="flex-1 bg-sage text-dusk font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform">
                     שמור שינויים
                 </button>
-                <button onclick="app.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50">
+                <button onclick="App.closeSettings()" class="px-6 py-3 rounded-xl text-dusk/50 font-medium hover:bg-white/50">
                     ביטול
                 </button>
             </div>
@@ -326,7 +336,7 @@
     </div>
 
     <!-- APP LOGIC -->
-    <script>
+    <script type="module">
         /**
          * Wedding Elite Premium - Core Architecture
          * Uses Proxy for reactive state and debounced persistence.
@@ -366,7 +376,7 @@
         };
 
         // --- Persistence Engine ---
-        const saveToStorage = () => {
+        const saveToStorage = (state) => {
             localStorage.setItem(DB_KEY, JSON.stringify(state));
         };
         
@@ -389,66 +399,44 @@
         const handler = {
             set(target, property, value) {
                 target[property] = value;
-                debouncedSave();
+                debouncedSave(state);
                 // Trigger UI updates based on what changed
-                if (property === 'budget' || property === 'guests') app.renderBudget();
-                if (property === 'rabbinate') app.renderRabbinate();
-                if (property === 'vendors') app.renderVendors();
-                if (property === 'notes') app.renderNotes();
-                if (property === 'couple') app.renderHero();
+                if (property === 'budget' || property === 'guests') Budget.render();
+                if (property === 'rabbinate') Rabbinate.render();
+                if (property === 'vendors') Vendors.render();
+                if (property === 'notes') Notes.render();
+                if (property === 'couple') Dashboard.renderHero();
                 return true;
             }
         };
 
         // Load or Init
         let loadedData = JSON.parse(localStorage.getItem(DB_KEY)) || initialState;
-        // Merge with default to ensure new fields exist
         loadedData = { ...initialState, ...loadedData };
         
         const state = new Proxy(loadedData, handler);
 
-        // --- Application Logic ---
-        const app = {
-            init() {
-                this.renderHero();
-                this.renderBudget();
-                this.renderRabbinate();
-                this.renderVendors();
-                this.renderNotes();
-                this.startTimer();
-                this.navTo('home');
-                
-                // Restore inputs
-                document.getElementById('guestsFamily').value = state.guests.family || '';
-                document.getElementById('guestsFriends').value = state.guests.friends || '';
-                document.getElementById('guestsWork').value = state.guests.work || '';
-                this.calcGifts();
-            },
+        // --- Modules ---
 
-            // --- Navigation ---
-            navTo(tabName) {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`view-${tabName}`).classList.remove('hidden');
-                
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    if(btn.dataset.target === tabName) {
-                        btn.classList.remove('text-dusk/40');
-                        btn.classList.add('text-sageDark', 'scale-110');
-                    } else {
-                        btn.classList.add('text-dusk/40');
-                        btn.classList.remove('text-sageDark', 'scale-110');
-                    }
-                });
-            },
+        const Theme = {
+            update(daysRemaining) {
+                const body = document.body;
+                if (daysRemaining < 30) {
+                    body.classList.add('theme-festive');
+                } else {
+                    body.classList.remove('theme-festive');
+                }
+            }
+        };
 
-            // --- Dashboard & Timer ---
+        const Dashboard = {
             renderHero() {
                 document.getElementById('coupleNamesDisplay').textContent = `${state.couple.groom} & ${state.couple.bride}`;
                 document.getElementById('weddingDateDisplay').textContent = new Date(state.couple.date).toLocaleDateString('he-IL');
             },
 
             startTimer() {
-                const update = () => {
+                const animate = () => {
                     const now = new Date().getTime();
                     const weddingDate = new Date(state.couple.date).getTime();
                     const distance = weddingDate - now;
@@ -465,24 +453,27 @@
                     document.getElementById('timerMins').innerText = minutes;
                     document.getElementById('timerSecs').innerText = seconds;
 
-                    // Dynamic Theme Shift
-                    if (days < 30) {
-                        document.documentElement.style.setProperty('--bg-color', '#E6B89C'); // Warm
-                        document.documentElement.style.setProperty('--accent-color', '#D4AF37'); // Gold
-                    }
+                    // Theme Update
+                    Theme.update(days);
 
-                    // Radial Progress (Mock calculation based on time passed vs 1 year)
+                    // Radial Progress
                     const totalTime = 1000 * 60 * 60 * 24 * 365; 
                     const progress = Math.min(100, Math.max(0, 100 - (distance / totalTime * 100)));
                     const offset = 283 - (283 * progress / 100);
-                    document.getElementById('progressCircle').style.strokeDashoffset = offset;
-                    document.getElementById('progressText').innerText = Math.floor(progress) + '%';
-                };
-                setInterval(update, 1000);
-                update();
-            },
+                    
+                    const circle = document.getElementById('progressCircle');
+                    if(circle) circle.style.strokeDashoffset = offset;
+                    
+                    const text = document.getElementById('progressText');
+                    if(text) text.innerText = Math.floor(progress) + '%';
 
-            // --- Budget Engine ---
+                    requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+            }
+        };
+
+        const Budget = {
             calcGifts() {
                 const fam = Number(document.getElementById('guestsFamily').value) || 0;
                 const fri = Number(document.getElementById('guestsFriends').value) || 0;
@@ -494,7 +485,7 @@
                 document.getElementById('predictedIncome').innerText = `₪${total.toLocaleString()}`;
             },
 
-            renderBudget() {
+            render() {
                 const grid = document.getElementById('budgetGrid');
                 grid.innerHTML = '';
                 
@@ -516,10 +507,10 @@
                                 <span class="text-xs text-dusk/60">₪${cat.paid} / ₪${cat.planned}</span>
                             </div>
                             <div class="w-full bg-white/30 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-sage h-full" style="width: ${percent}%"></div>
+                                <div class="bg-sage h-full accent-target" style="width: ${percent}%"></div>
                             </div>
                         </div>
-                        <button onclick="app.editBudgetCat(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="Budget.edit(${idx})" class="text-dusk/40 hover:text-sageDark"><i class="fa-solid fa-pen"></i></button>
                     `;
                     grid.appendChild(el);
                 });
@@ -528,18 +519,18 @@
                 document.getElementById('totalRemainingDisplay').innerText = `₪${(state.totalBudget - totalPaid).toLocaleString()}`;
             },
 
-            editBudgetCat(idx) {
+            edit(idx) {
                 const cat = state.budget[idx];
                 const newPaid = prompt(`כמה שולם עבור ${cat.name}?`, cat.paid);
                 if (newPaid !== null) {
                     state.budget[idx].paid = Number(newPaid);
-                    // Trigger proxy set
-                    state.budget = [...state.budget];
+                    state.budget = [...state.budget]; // Trigger proxy
                 }
-            },
+            }
+        };
 
-            // --- Rabbinate Navigator ---
-            renderRabbinate() {
+        const Rabbinate = {
+            render() {
                 const list = document.getElementById('rabbinateList');
                 list.innerHTML = '';
                 
@@ -547,7 +538,7 @@
                     const el = document.createElement('div');
                     el.className = `p-4 rounded-xl border transition-all flex items-center gap-3 ${task.done ? 'bg-sage/20 border-sage' : 'bg-white/40 border-white'}`;
                     el.innerHTML = `
-                        <div onclick="app.toggleRabbinate(${idx})" class="w-6 h-6 rounded-full border-2 border-dusk/20 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : ''}">
+                        <div onclick="Rabbinate.toggle(${idx})" class="w-6 h-6 rounded-full border-2 border-dusk/20 flex items-center justify-center cursor-pointer ${task.done ? 'bg-sage border-sage' : ''}">
                             ${task.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
                         </div>
                         <span class="${task.done ? 'line-through text-dusk/50' : 'text-dusk font-medium'}">${task.text}</span>
@@ -556,14 +547,15 @@
                 });
             },
 
-            toggleRabbinate(idx) {
+            toggle(idx) {
                 state.rabbinate[idx].done = !state.rabbinate[idx].done;
-                state.rabbinate = [...state.rabbinate]; // Trigger reactivity
-                if (state.rabbinate[idx].done) this.confetti();
-            },
+                state.rabbinate = [...state.rabbinate];
+                if (state.rabbinate[idx].done) App.confetti();
+            }
+        };
 
-            // --- Vendor CRM ---
-            renderVendors() {
+        const Vendors = {
+            render() {
                 const list = document.getElementById('vendorsList');
                 list.innerHTML = '';
                 
@@ -587,13 +579,13 @@
                                 ${v.contract ? 'חוזה חתום' : 'אין חוזה'}
                             </span>
                         </div>
-                        <button onclick="app.deleteVendor(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="Vendors.delete(${idx})" class="absolute top-4 left-4 text-dusk/20 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
                     `;
                     list.appendChild(el);
                 });
             },
 
-            addVendor() {
+            add() {
                 const name = prompt("שם העסק:");
                 if (!name) return;
                 state.vendors.push({
@@ -608,15 +600,16 @@
                 state.vendors = [...state.vendors];
             },
 
-            deleteVendor(idx) {
+            delete(idx) {
                 if(confirm("למחוק ספק זה?")) {
                     state.vendors.splice(idx, 1);
                     state.vendors = [...state.vendors];
                 }
-            },
+            }
+        };
 
-            // --- Visual Notes ---
-            renderNotes() {
+        const Notes = {
+            render() {
                 const grid = document.getElementById('notesGrid');
                 grid.innerHTML = '';
                 
@@ -625,13 +618,13 @@
                     el.className = `note-card p-4 rounded-xl shadow-sm min-h-[120px] flex flex-col justify-between ${note.color || 'bg-yellow-100'}`;
                     el.innerHTML = `
                         <p class="text-dusk font-handwriting text-sm leading-relaxed">${note.text}</p>
-                        <button onclick="app.deleteNote(${idx})" class="self-end text-dusk/30 hover:text-dusk"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="Notes.delete(${idx})" class="self-end text-dusk/30 hover:text-dusk"><i class="fa-solid fa-trash-can"></i></button>
                     `;
                     grid.appendChild(el);
                 });
             },
 
-            addNote() {
+            add() {
                 const text = prompt("תוכן הפתק:");
                 if (!text) return;
                 const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100'];
@@ -641,12 +634,45 @@
                 state.notes = [...state.notes];
             },
 
-            deleteNote(idx) {
+            delete(idx) {
                 state.notes.splice(idx, 1);
                 state.notes = [...state.notes];
+            }
+        };
+
+        // --- App Core ---
+        const App = {
+            init() {
+                Dashboard.renderHero();
+                Budget.render();
+                Rabbinate.render();
+                Vendors.render();
+                Notes.render();
+                Dashboard.startTimer();
+                this.navTo('home');
+                
+                // Restore inputs
+                document.getElementById('guestsFamily').value = state.guests.family || '';
+                document.getElementById('guestsFriends').value = state.guests.friends || '';
+                document.getElementById('guestsWork').value = state.guests.work || '';
+                Budget.calcGifts();
             },
 
-            // --- Settings ---
+            navTo(tabName) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${tabName}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if(btn.dataset.target === tabName) {
+                        btn.classList.remove('text-dusk/40');
+                        btn.classList.add('text-sageDark', 'scale-110');
+                    } else {
+                        btn.classList.add('text-dusk/40');
+                        btn.classList.remove('text-sageDark', 'scale-110');
+                    }
+                });
+            },
+
             openSettings() {
                 document.getElementById('groomNameInput').value = state.couple.groom;
                 document.getElementById('brideNameInput').value = state.couple.bride;
@@ -670,7 +696,6 @@
                 this.closeSettings();
             },
 
-            // --- Effects ---
             confetti() {
                 confetti({
                     particleCount: 150,
@@ -681,8 +706,14 @@
             }
         };
 
-        // Start
-        app.init();
+        // Expose to window for HTML onclick handlers
+        window.App = App;
+        window.Budget = Budget;
+        window.Vendors = Vendors;
+        window.Notes = Notes;
+        window.Rabbinate = Rabbinate;
+
+        App.init();
 
     </script>
 </body>
