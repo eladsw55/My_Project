@@ -2,111 +2,207 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Wedding Planner Premium</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="style.css">
-    
-    <script src="script.js" defer></script>
+
+    <!-- Preload Critical Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+
+    <!-- Font Awesome - deferred -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+
+    <!-- Critical CSS Inline (above-the-fold only) -->
+    <style>
+        /* Critical inline styles - renders header + dashboard skeleton instantly */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-dark: #0f172a;
+            --primary-light: #1e293b;
+            --accent-gold: #d4af37;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: var(--primary-dark);
+            background-image: radial-gradient(circle at top right, #334155, var(--primary-dark));
+            color: var(--text-light);
+            font-family: 'Assistant', sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        header { padding: 30px 20px 15px; text-align: center; }
+        .couple-names { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-gold); }
+        .countdown { font-size: 1rem; color: var(--text-muted); }
+        .app-section { display: none; }
+        .app-section.active { display: block; animation: fadeIn 0.3s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Skeleton Loader */
+        .skeleton { background: linear-gradient(90deg, var(--glass-bg) 25%, rgba(255,255,255,0.12) 50%, var(--glass-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 8px; }
+        .skeleton-text { height: 1em; margin: 8px 0; }
+        .skeleton-text.w-60 { width: 60%; }
+        .skeleton-text.w-40 { width: 40%; }
+        .skeleton-text.w-80 { width: 80%; }
+        .skeleton-block { height: 120px; margin: 10px 20px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Initial Loading Screen */
+        #appLoading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        #appContent { display: none; }
+        .app-ready #appLoading { display: none; }
+        .app-ready #appContent { display: block; }
+    </style>
+
+    <!-- Main CSS - non-blocking -->
+    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="style.css"></noscript>
+
+    <!-- Fallback for CSS loading -->
+    <noscript>
+        <style>
+            body { text-align: center; padding: 40px; font-family: sans-serif; }
+            .noscript-msg { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 400px; margin: 100px auto; border: 1px solid #d4af37; }
+            .noscript-msg h2 { color: #d4af37; margin-bottom: 10px; }
+            .noscript-msg p { color: #94a3b8; }
+        </style>
+        <div class="noscript-msg">
+            <h2>⚠️ נדרש JavaScript</h2>
+            <p>האתר דורש JavaScript פעיל כדי לעבוד. אנא הפעל JavaScript בדפדפן שלך.</p>
+        </div>
+    </noscript>
 </head>
 <body>
-
-    <header>
-        <h1 class="couple-names">החתונה של <span id="namesDisplay">...</span></h1>
-        <div class="countdown-container">
-            <p id="countdownDisplay" class="countdown">טוען שעון...</p>
+    <!-- Loading Skeleton (shows instantly, before JS loads) -->
+    <div id="appLoading" role="status" aria-label="טוען...">
+        <header>
+            <div class="skeleton skeleton-text w-60" style="height: 2rem; margin: 0 auto;"></div>
+            <div class="skeleton skeleton-text w-40" style="height: 1rem; margin: 10px auto 0;"></div>
+        </header>
+        <div class="skeleton skeleton-block"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px;">
+            <div class="skeleton skeleton-block" style="margin: 0;"></div>
+            <div class="skeleton skeleton-block" style="margin: 0;"></div>
         </div>
-    </header>
+        <div class="skeleton skeleton-block" style="height: 60px;"></div>
+    </div>
 
-    <main>
-        <section id="dashboard" class="app-section active">
-            <div class="list-container">
-                <div class="glass-card summary-card">
-                    <h3><i class="fas fa-wallet"></i> תקציב כולל</h3>
+    <!-- Actual App Content (hidden until JS ready) -->
+    <div id="appContent">
+        <!-- Header -->
+        <header>
+            <h1 class="couple-names" id="namesDisplay">החתונה של ...</h1>
+            <p class="countdown" id="countdownDisplay">טוען שעון...</p>
+        </header>
+
+        <!-- ==================== Dashboard Section ==================== -->
+        <section id="dashboard" class="app-section active" aria-label="לוח בקרה">
+            <div class="dashboard-container">
+                <!-- Budget Card -->
+                <div class="glass-card budget-card">
+                    <div class="budget-header">
+                        <span class="text-muted"><i class="fas fa-wallet" aria-hidden="true"></i> תקציב כולל</span>
+                        <span id="budgetTotal">₪0</span>
+                    </div>
                     <div class="budget-row">
                         <span class="big-number" id="budgetLeft">₪0</span>
-                        <small class="text-muted">נותר</small>
+                        <span class="text-muted">נותר</span>
                     </div>
-                    <div class="progress-container">
+                    <div class="progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar" id="budgetProgress"></div>
                     </div>
-                    <p class="budget-subtitle">
-                        הוצאנו <span id="budgetSpent" class="font-bold">0</span> מתוך <span id="budgetTotal">0</span>
-                    </p>
+                    <p class="text-muted budget-detail" id="budgetSpent">הוצאנו ₪0 מתוך ₪0</p>
                 </div>
 
+                <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="glass-card stat-item">
-                        <i class="fas fa-users icon-blue"></i>
+                        <i class="fas fa-users icon-blue" aria-hidden="true"></i>
                         <span class="stat-value" id="totalGuests">0</span>
-                        <span class="stat-label">אורחים</span>
+                        <span class="text-muted">אורחים</span>
                     </div>
                     <div class="glass-card stat-item">
-                        <i class="fas fa-gift icon-pink"></i>
+                        <i class="fas fa-gift icon-pink" aria-hidden="true"></i>
                         <span class="stat-value" id="totalGifts">₪0</span>
-                        <span class="stat-label">מתנות</span>
+                        <span class="text-muted">מתנות</span>
                     </div>
                 </div>
-                
-                <div class="glass-card action-card" id="btnOpenSettings">
-                    <h4>הגדרות חתונה <i class="fas fa-cog spin-hover"></i></h4>
+
+                <!-- Settings Button -->
+                <div class="glass-card action-card" id="btnOpenSettings" role="button" tabindex="0" aria-label="הגדרות חתונה">
+                    <i class="fas fa-cog" aria-hidden="true"></i>
+                    <span>הגדרות חתונה</span>
                 </div>
             </div>
         </section>
 
-        <section id="expenses" class="app-section">
+        <!-- ==================== Expenses Section ==================== -->
+        <section id="expenses" class="app-section" aria-label="הוצאות וספקים">
             <div class="list-container">
                 <h2 class="section-title">הוצאות וספקים</h2>
-                <div id="expensesList" class="scrollable-list">
-                    </div>
+                <div id="expensesList" role="list"></div>
+                <button class="fab" id="btnAddExpense" aria-label="הוסף הוצאה">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                </button>
             </div>
-            <button class="fab" id="btnAddExpense" aria-label="הוסף הוצאה">
-                <i class="fas fa-plus"></i>
-            </button>
         </section>
 
-        <section id="guests" class="app-section">
+        <!-- ==================== Guests Section ==================== -->
+        <section id="guests" class="app-section" aria-label="ניהול אורחים">
             <div class="list-container">
                 <h2 class="section-title">מוזמנים</h2>
                 <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="guestSearch" class="app-input" placeholder="חפש אורח...">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <input type="search" class="app-input" id="guestSearch" placeholder="חפש אורח..." autocomplete="off" enterkeyhint="search">
                 </div>
-                <div id="guestsList" class="scrollable-list">
-                    </div>
+                <div id="guestsList" role="list"></div>
+                <button class="fab" id="btnAddGuest" aria-label="הוסף אורח">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                </button>
             </div>
-            <button class="fab" id="btnAddGuest" aria-label="הוסף אורח">
-                <i class="fas fa-user-plus"></i>
-            </button>
         </section>
-    </main>
 
-    <div id="itemModal" class="modal">
-        <div class="modal-content glass-card">
-            <h3 id="modalTitle" class="modal-title">כותרת</h3>
-            <div id="modalBody" class="modal-body"></div>
-            <div class="modal-actions">
-                <button class="btn-primary" id="modalActionBtn">שמור</button>
-                <button class="btn-secondary" id="modalCloseBtn">ביטול</button>
+        <!-- ==================== Modal ==================== -->
+        <div class="modal" id="itemModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-content glass-card">
+                <h3 id="modalTitle">כותרת</h3>
+                <div id="modalBody"></div>
+                <div class="modal-actions">
+                    <button class="btn-primary" id="modalActionBtn">שמור</button>
+                    <button class="btn-secondary" id="modalCloseBtn">ביטול</button>
+                </div>
             </div>
         </div>
+
+        <!-- ==================== Bottom Navigation ==================== -->
+        <nav class="bottom-nav" role="tablist" aria-label="ניווט ראשי">
+            <button class="nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard">
+                <i class="fas fa-home" aria-hidden="true"></i>
+                <span>ראשי</span>
+            </button>
+            <button class="nav-item" data-tab="expenses" role="tab" aria-selected="false" aria-controls="expenses">
+                <i class="fas fa-receipt" aria-hidden="true"></i>
+                <span>תקציב</span>
+            </button>
+            <button class="nav-item" data-tab="guests" role="tab" aria-selected="false" aria-controls="guests">
+                <i class="fas fa-users" aria-hidden="true"></i>
+                <span>אורחים</span>
+            </button>
+        </nav>
     </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-item active" data-tab="dashboard">
-            <i class="fas fa-home"></i> <span>ראשי</span>
-        </button>
-        <button class="nav-item" data-tab="expenses">
-            <i class="fas fa-file-invoice-dollar"></i> <span>תקציב</span>
-        </button>
-        <button class="nav-item" data-tab="guests">
-            <i class="fas fa-users"></i> <span>אורחים</span>
-        </button>
-    </nav>
-
+    <!-- JS - deferred for non-blocking load -->
+    <script src="script.js" defer></script>
 </body>
 </html>

@@ -1,4 +1,10 @@
-/* --- Variables & Reset --- */
+/* ═══════════════════════════════════════════════════════
+   Wedding Planner Premium — Optimized CSS
+   Structure: Variables → Reset → Base → Layout → 
+              Components → Animations → Utilities → Mobile
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── 1. VARIABLES ─── */
 :root {
     --primary-dark: #0f172a;
     --primary-light: #1e293b;
@@ -11,101 +17,650 @@
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.1);
     --shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    
     --font-main: 'Assistant', sans-serif;
     --font-heading: 'Playfair Display', serif;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --nav-height: 72px;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+/* ─── 2. RESET ─── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── 3. BASE ─── */
+html {
+    /* Prevent font size inflation on mobile */
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    /* Smooth scroll for anchor navigation */
+    scroll-behavior: smooth;
+}
 
 body {
     background-color: var(--primary-dark);
     background-image: radial-gradient(circle at top right, #334155, var(--primary-dark));
+    /* Fix background to avoid repaint on scroll */
+    background-attachment: fixed;
     color: var(--text-light);
     font-family: var(--font-main);
+    font-size: 16px;
+    line-height: 1.5;
     min-height: 100vh;
-    padding-bottom: 90px; /* Space for nav */
+    min-height: 100dvh;
+    padding-bottom: calc(var(--nav-height) + 20px);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Contain layout to prevent full-page reflows */
+    contain: style;
 }
 
-/* --- Typography --- */
-h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--accent-gold); letter-spacing: 0.5px; }
-.text-muted { color: var(--text-muted); }
-.font-bold { font-weight: 700; }
+/* ─── 4. TYPOGRAPHY ─── */
+h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    color: var(--accent-gold);
+    letter-spacing: 0.5px;
+    /* Prevent layout shift from font swap */
+    font-display: swap;
+}
 
-/* --- Components: Glass Card --- */
+/* ─── 5. LAYOUT: HEADER ─── */
+header {
+    padding: 30px 20px 15px;
+    text-align: center;
+    /* Contain paint to this region */
+    contain: layout;
+}
+
+.couple-names {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.countdown {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    /* Fixed height to prevent CLS */
+    min-height: 1.5em;
+}
+
+/* ─── 6. LAYOUT: DASHBOARD ─── */
+.dashboard-container {
+    padding: 0 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.budget-card {
+    /* Isolate paint operations */
+    contain: layout style;
+}
+
+.budget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.budget-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+}
+
+.big-number {
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
+    font-weight: 800;
+    color: #fff;
+    /* Tabular nums for stable width */
+    font-variant-numeric: tabular-nums;
+}
+
+.budget-detail {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.progress-container {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 15px 0;
+    /* Contain paint for progress bar animation */
+    contain: strict;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-gold), #fde68a);
+    width: 0%;
+    /* GPU-accelerated transition — use transform instead of width */
+    transform-origin: right;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    /* Start at 0 width using scaleX */
+    transform: scaleX(0);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    /* Contain paint */
+    contain: layout style;
+}
+
+.stat-value {
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    font-weight: 800;
+    display: block;
+    margin-top: 5px;
+    font-variant-numeric: tabular-nums;
+    /* Fixed height to prevent CLS */
+    min-height: 1.5em;
+}
+
+.icon-blue { color: #60a5fa; }
+.icon-pink { color: #f472b6; }
+
+/* ─── 7. COMPONENT: GLASS CARD ─── */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: 20px;
     margin-bottom: 15px;
     box-shadow: var(--shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* GPU layer for smooth interaction */
+    transform: translateZ(0);
 }
 
-.glass-card:active { transform: scale(0.98); }
-.action-card { text-align: center; cursor: pointer; border: 1px dashed var(--glass-border); }
-.action-card:hover { border-color: var(--accent-gold); background: rgba(212, 175, 55, 0.1); }
+/* Active state - use transform (GPU) not box-shadow changes */
+.glass-card:active {
+    transform: scale(0.98) translateZ(0);
+    transition: transform var(--transition-fast);
+}
 
-/* --- Header --- */
-header { padding: 30px 20px 15px; text-align: center; }
-.couple-names { font-size: 2rem; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-.countdown { font-size: 1rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.action-card {
+    text-align: center;
+    cursor: pointer;
+    border: 1px dashed var(--glass-border);
+    transition: border-color var(--transition-normal), background var(--transition-normal);
+}
 
-/* --- Dashboard --- */
-.budget-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
-.big-number { font-size: 2.2rem; font-weight: 800; color: #fff; }
+.action-card:hover,
+.action-card:focus-visible {
+    border-color: var(--accent-gold);
+    background: rgba(212, 175, 55, 0.1);
+}
 
-.progress-container { width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin: 15px 0; }
-.progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent-gold), #fde68a); width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.action-card:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 2px;
+}
 
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 0; }
-.stat-item { text-align: center; padding: 15px; }
-.stat-value { font-size: 1.6rem; font-weight: 800; display: block; margin-top: 5px; }
-.icon-blue { color: #60a5fa; }
-.icon-pink { color: #f472b6; }
+/* ─── 8. COMPONENT: LIST ─── */
+.list-container {
+    padding: 0 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    /* Prevent reflows when list items change */
+    contain: layout style;
+}
 
-/* --- Lists --- */
-.list-container { padding: 0 20px; max-width: 600px; margin: 0 auto; }
-.section-title { margin-bottom: 20px; font-size: 1.5rem; }
-.list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.list-item:last-child { border-bottom: none; }
-.item-details h4 { color: var(--text-light); margin-bottom: 4px; font-size: 1.1rem; }
-.item-details p { font-size: 0.85rem; color: var(--text-muted); }
-.item-actions button { background: none; border: none; color: var(--text-muted); margin-right: 15px; font-size: 1.1rem; cursor: pointer; transition: color 0.2s; }
-.item-actions button:hover { color: var(--danger); }
+.section-title {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
 
-/* --- Forms & Inputs --- */
-.search-box { position: relative; margin-bottom: 15px; }
-.search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-.app-input { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: #fff; padding: 14px 40px 14px 15px; border-radius: 12px; font-family: var(--font-main); font-size: 1rem; transition: border-color 0.3s; }
-.app-input:focus { border-color: var(--accent-gold); }
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Contain each item for virtual scroll prep */
+    contain: layout style;
+}
 
-/* --- Buttons --- */
-.fab { position: fixed; bottom: 100px; left: 25px; background: var(--accent-gold); color: var(--primary-dark); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4); border: none; z-index: 100; cursor: pointer; transition: transform 0.2s, background 0.2s; }
-.fab:hover { transform: scale(1.1); background: var(--accent-gold-hover); }
-.fab:active { transform: scale(0.9); }
+.list-item:last-child {
+    border-bottom: none;
+}
 
-.btn-primary { background: var(--accent-gold); color: var(--primary-dark); width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-.btn-secondary { width: 100%; padding: 14px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; margin-top: 5px; }
+.item-details h4 {
+    color: var(--text-light);
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+}
 
-/* --- Navigation --- */
-.bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--glass-border); z-index: 99; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-.nav-item { color: var(--text-muted); text-align: center; font-size: 0.75rem; background: none; border: none; cursor: pointer; flex: 1; transition: color 0.3s; }
-.nav-item i { display: block; font-size: 1.3rem; margin-bottom: 4px; transition: transform 0.2s; }
-.nav-item.active { color: var(--accent-gold); }
-.nav-item.active i { transform: translateY(-3px); }
+.item-details p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
 
-/* --- Modal & Animations --- */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
-.modal.show { opacity: 1; }
-.modal-content { width: 90%; max-width: 400px; transform: translateY(20px); transition: transform 0.3s ease; background: #1e293b; border: 1px solid var(--accent-gold); }
-.modal.show .modal-content { transform: translateY(0); }
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-.app-section { display: none; opacity: 0; animation: fadeIn 0.4s forwards; }
-.app-section.active { display: block; }
+.item-actions button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+    /* Larger touch target */
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.item-actions button:hover {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+    font-size: 1rem;
+}
+
+/* ─── 9. COMPONENT: FORM INPUTS ─── */
+.search-box {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.search-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.app-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    padding: 14px 40px 14px 15px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    transition: border-color var(--transition-normal);
+    /* Prevent zoom on iOS */
+    font-size: max(16px, 1rem);
+}
+
+.app-input:focus {
+    border-color: var(--accent-gold);
+    outline: none;
+}
+
+.app-input::placeholder {
+    color: var(--text-muted);
+}
+
+.modal-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    margin-top: 12px;
+}
+
+.modal-label:first-child {
+    margin-top: 0;
+}
+
+/* ─── 10. COMPONENT: BUTTONS ─── */
+.fab {
+    position: fixed;
+    bottom: calc(var(--nav-height) + 25px);
+    left: 25px;
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+    border: none;
+    z-index: 100;
+    cursor: pointer;
+    /* GPU-accelerated hover/active */
+    transform: translateZ(0);
+    transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.fab:hover {
+    transform: scale(1.1) translateZ(0);
+    background: var(--accent-gold-hover);
+}
+
+.fab:active {
+    transform: scale(0.92) translateZ(0);
+}
+
+.btn-primary {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: bold;
+    font-size: 1rem;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-primary:hover {
+    background: var(--accent-gold-hover);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-top: 5px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+}
+
+/* ─── 11. COMPONENT: NAVIGATION ─── */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    border-top: 1px solid var(--glass-border);
+    z-index: 99;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    /* Contain paint — nav never changes layout */
+    contain: layout style paint;
+    /* Force GPU layer for smooth scrolling underneath */
+    transform: translateZ(0);
+}
+
+.nav-item {
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.75rem;
+    font-family: var(--font-main);
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    transition: color var(--transition-fast);
+    /* Adequate touch target */
+    padding: 4px 0;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-item i {
+    display: block;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+    /* GPU-accelerated transform */
+    transition: transform var(--transition-fast);
+    will-change: transform;
+}
+
+.nav-item.active {
+    color: var(--accent-gold);
+}
+
+.nav-item.active i {
+    transform: translateY(-3px);
+}
+
+/* ─── 12. COMPONENT: MODAL ─── */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    /* GPU-accelerated opacity */
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    /* Prevent background scroll */
+    overscroll-behavior: contain;
+}
+
+.modal.show {
+    opacity: 1;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+    /* GPU-accelerated entrance */
+    transform: translateY(20px) translateZ(0);
+    transition: transform var(--transition-normal);
+    background: var(--primary-light);
+    border: 1px solid var(--accent-gold);
+    overscroll-behavior: contain;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0) translateZ(0);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    margin-top: 20px;
+}
+
+.modal-content .app-input {
+    margin-bottom: 4px;
+}
+
+.modal-content select.app-input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 15px center;
+    padding-left: 35px;
+}
+
+/* ─── 13. SECTIONS ─── */
+.app-section {
+    display: none;
+    opacity: 0;
+}
+
+.app-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* ─── 14. ANIMATIONS — GPU only (transform + opacity) ─── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) translateZ(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateZ(0);
+    }
+}
+
+/* Skeleton (kept from inline, duplicated for full CSS load) */
+.skeleton {
+    background: linear-gradient(90deg, var(--glass-bg) 25%, rgba(255, 255, 255, 0.12) 50%, var(--glass-bg) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ─── 15. UTILITIES ─── */
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-gold { color: var(--accent-gold); }
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ─── 16. MEDIA QUERIES ─── */
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .progress-bar {
+        transition: none;
+    }
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+    .big-number {
+        font-size: 1.6rem;
+    }
+    .couple-names {
+        font-size: 1.5rem;
+    }
+    .stats-grid {
+        gap: 10px;
+    }
+    .glass-card {
+        padding: 15px;
+    }
+}
+
+/* Tablets and up */
+@media (min-width: 768px) {
+    .dashboard-container {
+        max-width: 700px;
+    }
+    .list-container {
+        max-width: 700px;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    body {
+        padding-bottom: 0;
+    }
+    .bottom-nav {
+        position: relative;
+        max-width: 600px;
+        margin: 20px auto 0;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+    }
+    .fab {
+        bottom: 30px;
+    }
+}
+
+/* Landscape phone - compact nav */
+@media (max-height: 500px) and (orientation: landscape) {
+    header {
+        padding: 15px 20px 10px;
+    }
+    .bottom-nav {
+        padding: 8px 0;
+    }
+    .nav-item {
+        min-height: 40px;
+    }
+}
+
+/* Dark mode is default, but handle forced light mode */
+@media (prefers-color-scheme: light) {
+    /* Keep dark theme - this is a wedding planner with dark glassmorphism */
+    :root {
+        color-scheme: dark;
+    }
+}
