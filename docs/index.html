@@ -3,206 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#1a1520">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Wedding Planner Premium</title>
+    <meta name="description" content="ניהול חתונה חכם — תקציב, אורחים, ספקים ומשימות במקום אחד">
+    <title>Chatan — ניהול חתונה חכם</title>
 
-    <!-- Preload Critical Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
-
-    <!-- Font Awesome - deferred -->
-    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
-
-    <!-- Critical CSS Inline (above-the-fold only) -->
-    <style>
-        /* Critical inline styles - renders header + dashboard skeleton instantly */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary-dark: #0f172a;
-            --primary-light: #1e293b;
-            --accent-gold: #d4af37;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-        body {
-            background-color: var(--primary-dark);
-            background-image: radial-gradient(circle at top right, #334155, var(--primary-dark));
-            color: var(--text-light);
-            font-family: 'Assistant', sans-serif;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding-bottom: 90px;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-        header { padding: 30px 20px 15px; text-align: center; }
-        .couple-names { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-gold); }
-        .countdown { font-size: 1rem; color: var(--text-muted); }
-        .app-section { display: none; }
-        .app-section.active { display: block; animation: fadeIn 0.3s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Skeleton Loader */
-        .skeleton { background: linear-gradient(90deg, var(--glass-bg) 25%, rgba(255,255,255,0.12) 50%, var(--glass-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 8px; }
-        .skeleton-text { height: 1em; margin: 8px 0; }
-        .skeleton-text.w-60 { width: 60%; }
-        .skeleton-text.w-40 { width: 40%; }
-        .skeleton-text.w-80 { width: 80%; }
-        .skeleton-block { height: 120px; margin: 10px 20px; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        /* Initial Loading Screen */
-        #appLoading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
-        #appContent { display: none; }
-        .app-ready #appLoading { display: none; }
-        .app-ready #appContent { display: block; }
-    </style>
-
-    <!-- Main CSS - non-blocking -->
-    <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="style.css"></noscript>
-
-    <!-- Fallback for CSS loading -->
-    <noscript>
-        <style>
-            body { text-align: center; padding: 40px; font-family: sans-serif; }
-            .noscript-msg { background: #1e293b; padding: 30px; border-radius: 12px; max-width: 400px; margin: 100px auto; border: 1px solid #d4af37; }
-            .noscript-msg h2 { color: #d4af37; margin-bottom: 10px; }
-            .noscript-msg p { color: #94a3b8; }
-        </style>
-        <div class="noscript-msg">
-            <h2>⚠️ נדרש JavaScript</h2>
-            <p>האתר דורש JavaScript פעיל כדי לעבוד. אנא הפעל JavaScript בדפדפן שלך.</p>
-        </div>
-    </noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading Skeleton (shows instantly, before JS loads) -->
-    <div id="appLoading" role="status" aria-label="טוען...">
-        <header>
-            <div class="skeleton skeleton-text w-60" style="height: 2rem; margin: 0 auto;"></div>
-            <div class="skeleton skeleton-text w-40" style="height: 1rem; margin: 10px auto 0;"></div>
-        </header>
-        <div class="skeleton skeleton-block"></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px;">
-            <div class="skeleton skeleton-block" style="margin: 0;"></div>
-            <div class="skeleton skeleton-block" style="margin: 0;"></div>
+
+    <!-- ══════════ ONBOARDING WIZARD ══════════ -->
+    <div id="onboarding" class="onboarding-overlay" style="display:none;">
+        <div class="onboarding-card">
+            <div class="onboarding-steps">
+                <div class="step-dot active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="ob-step active" id="obStep1">
+                <div class="ob-icon">💍</div>
+                <h1>מזל טוב!</h1>
+                <p class="ob-sub">בואו נתחיל לתכנן את החתונה המושלמת שלכם</p>
+                <div class="ob-fields">
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label for="obGroom">שם החתן</label>
+                            <input type="text" id="obGroom" class="premium-input" placeholder="דניאל">
+                        </div>
+                        <div class="field-group">
+                            <label for="obBride">שם הכלה</label>
+                            <input type="text" id="obBride" class="premium-input" placeholder="נועה">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-main" id="obNext1">בואו נתחיל <i class="fas fa-arrow-left"></i></button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="ob-step" id="obStep2">
+                <div class="ob-icon">📅</div>
+                <h1>מתי היום הגדול?</h1>
+                <p class="ob-sub">נתאים את לוח הזמנים בהתאם</p>
+                <div class="ob-fields">
+                    <div class="field-group">
+                        <label for="obDate">תאריך החתונה</label>
+                        <input type="date" id="obDate" class="premium-input">
+                    </div>
+                    <div class="field-group">
+                        <label for="obBudget">תקציב כולל (₪)</label>
+                        <input type="number" id="obBudget" class="premium-input" inputmode="numeric" placeholder="150,000" value="150000">
+                    </div>
+                </div>
+                <button class="btn-main" id="obNext2">המשך <i class="fas fa-arrow-left"></i></button>
+                <button class="btn-ghost" id="obBack2"><i class="fas fa-arrow-right"></i> חזור</button>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="ob-step" id="obStep3">
+                <div class="ob-icon">🎉</div>
+                <h1>כמה אורחים בערך?</h1>
+                <p class="ob-sub">אפשר תמיד לעדכן אחר כך</p>
+                <div class="ob-fields">
+                    <div class="field-group">
+                        <label for="obGuests">מספר אורחים משוער</label>
+                        <input type="number" id="obGuests" class="premium-input" inputmode="numeric" placeholder="300" value="300">
+                    </div>
+                </div>
+                <button class="btn-main" id="obFinish">🎊 יאללה, מתחילים!</button>
+                <button class="btn-ghost" id="obBack3"><i class="fas fa-arrow-right"></i> חזור</button>
+            </div>
         </div>
-        <div class="skeleton skeleton-block" style="height: 60px;"></div>
     </div>
 
-    <!-- Actual App Content (hidden until JS ready) -->
-    <div id="appContent">
+    <!-- ══════════ MAIN APP ══════════ -->
+    <div id="appShell" style="display:none;">
+
         <!-- Header -->
-        <header>
-            <h1 class="couple-names" id="namesDisplay">החתונה של ...</h1>
-            <p class="countdown" id="countdownDisplay">טוען שעון...</p>
+        <header class="app-header">
+            <div class="header-content">
+                <div>
+                    <h1 class="brand-name" id="headerNames">החתונה שלנו</h1>
+                    <div class="countdown-pill" id="countdownPill">
+                        <i class="fas fa-clock"></i>
+                        <span id="countdownText">טוען...</span>
+                    </div>
+                </div>
+                <button class="icon-btn" id="btnSettings" aria-label="הגדרות">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+            </div>
+            <div class="wedding-progress-wrap">
+                <div class="wp-track"><div class="wp-fill" id="wpFill"></div></div>
+                <span class="wp-label" id="wpLabel">0% הושלם</span>
+            </div>
         </header>
 
-        <!-- ==================== Dashboard Section ==================== -->
-        <section id="dashboard" class="app-section active" aria-label="לוח בקרה">
-            <div class="dashboard-container">
-                <!-- Budget Card -->
-                <div class="glass-card budget-card">
-                    <div class="budget-header">
-                        <span class="text-muted"><i class="fas fa-wallet" aria-hidden="true"></i> תקציב כולל</span>
-                        <span id="budgetTotal">₪0</span>
-                    </div>
-                    <div class="budget-row">
-                        <span class="big-number" id="budgetLeft">₪0</span>
-                        <span class="text-muted">נותר</span>
-                    </div>
-                    <div class="progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar" id="budgetProgress"></div>
-                    </div>
-                    <p class="text-muted budget-detail" id="budgetSpent">הוצאנו ₪0 מתוך ₪0</p>
+        <!-- ═══ DASHBOARD ═══ -->
+        <section id="secDashboard" class="page active">
+            <!-- Budget Hero -->
+            <div class="card card-budget">
+                <div class="cb-top">
+                    <span class="cb-label">נותר מהתקציב</span>
+                    <span class="cb-amount" id="dBudgetLeft">₪0</span>
                 </div>
-
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="glass-card stat-item">
-                        <i class="fas fa-users icon-blue" aria-hidden="true"></i>
-                        <span class="stat-value" id="totalGuests">0</span>
-                        <span class="text-muted">אורחים</span>
-                    </div>
-                    <div class="glass-card stat-item">
-                        <i class="fas fa-gift icon-pink" aria-hidden="true"></i>
-                        <span class="stat-value" id="totalGifts">₪0</span>
-                        <span class="text-muted">מתנות</span>
+                <div class="cb-bar-wrap">
+                    <div class="cb-bar-track"><div class="cb-bar-fill" id="dBudgetBar"></div></div>
+                    <div class="cb-bar-labels">
+                        <span id="dBudgetSpent">₪0 הוצאנו</span>
+                        <span id="dBudgetTotal">מתוך ₪0</span>
                     </div>
                 </div>
-
-                <!-- Settings Button -->
-                <div class="glass-card action-card" id="btnOpenSettings" role="button" tabindex="0" aria-label="הגדרות חתונה">
-                    <i class="fas fa-cog" aria-hidden="true"></i>
-                    <span>הגדרות חתונה</span>
+                <div class="cb-alert" id="budgetAlert" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="budgetAlertText"></span>
                 </div>
             </div>
-        </section>
 
-        <!-- ==================== Expenses Section ==================== -->
-        <section id="expenses" class="app-section" aria-label="הוצאות וספקים">
-            <div class="list-container">
-                <h2 class="section-title">הוצאות וספקים</h2>
-                <div id="expensesList" role="list"></div>
-                <button class="fab" id="btnAddExpense" aria-label="הוסף הוצאה">
-                    <i class="fas fa-plus" aria-hidden="true"></i>
+            <!-- Stats -->
+            <div class="stats-row">
+                <button class="stat-chip" data-go="secGuests">
+                    <div class="sc-icon blue"><i class="fas fa-users"></i></div>
+                    <span class="sc-val" id="dGuests">0</span>
+                    <span class="sc-lbl">אורחים</span>
+                </button>
+                <button class="stat-chip" data-go="secGuests">
+                    <div class="sc-icon green"><i class="fas fa-check-circle"></i></div>
+                    <span class="sc-val" id="dConfirmed">0</span>
+                    <span class="sc-lbl">אישרו</span>
+                </button>
+                <button class="stat-chip" data-go="secExpenses">
+                    <div class="sc-icon pink"><i class="fas fa-gift"></i></div>
+                    <span class="sc-val" id="dGifts">₪0</span>
+                    <span class="sc-lbl">מתנות</span>
                 </button>
             </div>
+
+            <!-- Tasks Preview -->
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fas fa-tasks"></i> משימות קרובות</h2>
+                    <button class="btn-text" id="btnAddTaskDash">+ הוסף</button>
+                </div>
+                <div id="dashTasks"></div>
+            </div>
+
+            <!-- Recent Expenses -->
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fas fa-receipt"></i> הוצאות אחרונות</h2>
+                    <button class="btn-text" data-go="secExpenses">ראה הכל →</button>
+                </div>
+                <div id="dashExpenses"></div>
+            </div>
         </section>
 
-        <!-- ==================== Guests Section ==================== -->
-        <section id="guests" class="app-section" aria-label="ניהול אורחים">
-            <div class="list-container">
-                <h2 class="section-title">מוזמנים</h2>
+        <!-- ═══ EXPENSES ═══ -->
+        <section id="secExpenses" class="page">
+            <div class="page-top">
+                <h2 class="page-title">הוצאות וספקים</h2>
+                <div class="summary-bar">
+                    <div class="sb-item"><span class="sb-val" id="eTotalCost">₪0</span><span class="sb-lbl">עלות</span></div>
+                    <div class="sb-sep"></div>
+                    <div class="sb-item"><span class="sb-val" id="eTotalPaid">₪0</span><span class="sb-lbl">שולם</span></div>
+                    <div class="sb-sep"></div>
+                    <div class="sb-item"><span class="sb-val accent" id="eRemaining">₪0</span><span class="sb-lbl">נותר</span></div>
+                </div>
+            </div>
+            <div class="chip-bar" id="expChipBar">
+                <button class="chip active" data-cat="all">הכל</button>
+                <button class="chip" data-cat="אולם">🏛 אולם</button>
+                <button class="chip" data-cat="קייטרינג">🍽 קייטרינג</button>
+                <button class="chip" data-cat="צילום">📷 צילום</button>
+                <button class="chip" data-cat="מוזיקה">🎵 מוזיקה</button>
+                <button class="chip" data-cat="לבוש">👗 לבוש</button>
+                <button class="chip" data-cat="אחר">📦 אחר</button>
+            </div>
+            <div id="expList" class="items-list"></div>
+            <div class="empty-state" id="expEmpty" style="display:none;">
+                <div class="empty-icon">📋</div>
+                <h3>עדיין אין הוצאות</h3>
+                <p>הוסיפו את ההוצאה הראשונה — אולם, צלם, DJ, שמלה...</p>
+                <button class="btn-main btn-sm" id="expEmptyBtn">+ הוסף הוצאה ראשונה</button>
+            </div>
+            <button class="fab" id="btnAddExp" aria-label="הוסף הוצאה"><i class="fas fa-plus"></i></button>
+        </section>
+
+        <!-- ═══ GUESTS ═══ -->
+        <section id="secGuests" class="page">
+            <div class="page-top">
+                <h2 class="page-title">ניהול אורחים</h2>
+                <div class="guest-stats-bar">
+                    <div class="gsb"><span class="gsb-val" id="gTotal">0</span><span class="gsb-lbl">סה״כ</span></div>
+                    <div class="gsb ok"><span class="gsb-val" id="gOk">0</span><span class="gsb-lbl">מגיעים</span></div>
+                    <div class="gsb wait"><span class="gsb-val" id="gWait">0</span><span class="gsb-lbl">ממתינים</span></div>
+                    <div class="gsb no"><span class="gsb-val" id="gNo">0</span><span class="gsb-lbl">לא מגיעים</span></div>
+                </div>
+            </div>
+            <div class="search-row">
                 <div class="search-box">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                    <input type="search" class="app-input" id="guestSearch" placeholder="חפש אורח..." autocomplete="off" enterkeyhint="search">
+                    <i class="fas fa-search"></i>
+                    <input type="search" class="premium-input" id="guestSearch" placeholder="חיפוש אורח..." autocomplete="off">
                 </div>
-                <div id="guestsList" role="list"></div>
-                <button class="fab" id="btnAddGuest" aria-label="הוסף אורח">
-                    <i class="fas fa-plus" aria-hidden="true"></i>
-                </button>
             </div>
+            <div class="chip-bar" id="guestChipBar">
+                <button class="chip active" data-gf="all">הכל</button>
+                <button class="chip" data-gf="מגיע">✅ מגיעים</button>
+                <button class="chip" data-gf="טרם אישר">⏳ ממתינים</button>
+                <button class="chip" data-gf="לא מגיע">❌ לא מגיעים</button>
+            </div>
+            <div id="guestList" class="items-list"></div>
+            <div class="empty-state" id="guestEmpty" style="display:none;">
+                <div class="empty-icon">👥</div>
+                <h3>הרשימה ריקה</h3>
+                <p>התחילו להוסיף אורחים — משפחה, חברים, עבודה...</p>
+                <button class="btn-main btn-sm" id="guestEmptyBtn">+ הוסף אורח ראשון</button>
+            </div>
+            <button class="fab" id="btnAddGuest" aria-label="הוסף אורח"><i class="fas fa-plus"></i></button>
         </section>
 
-        <!-- ==================== Modal ==================== -->
-        <div class="modal" id="itemModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <div class="modal-content glass-card">
-                <h3 id="modalTitle">כותרת</h3>
-                <div id="modalBody"></div>
-                <div class="modal-actions">
-                    <button class="btn-primary" id="modalActionBtn">שמור</button>
-                    <button class="btn-secondary" id="modalCloseBtn">ביטול</button>
+        <!-- ═══ TASKS ═══ -->
+        <section id="secTasks" class="page">
+            <div class="page-top">
+                <h2 class="page-title">רשימת משימות</h2>
+                <div class="tasks-prog-bar">
+                    <div class="tpb-track"><div class="tpb-fill" id="tpbFill"></div></div>
+                    <span class="tpb-text" id="tpbText">0 מתוך 0</span>
+                </div>
+            </div>
+            <div id="taskList" class="items-list"></div>
+            <div class="empty-state" id="taskEmpty" style="display:none;">
+                <div class="empty-icon">✅</div>
+                <h3>אין משימות</h3>
+                <p>הוסיפו משימות — הזמנת אולם, בחירת צלם, טעימות...</p>
+                <button class="btn-main btn-sm" id="taskEmptyBtn">+ הוסף משימה</button>
+            </div>
+            <button class="fab" id="btnAddTask" aria-label="הוסף משימה"><i class="fas fa-plus"></i></button>
+        </section>
+
+        <!-- ═══ MODAL ═══ -->
+        <div class="modal-overlay" id="modal" role="dialog" aria-modal="true">
+            <div class="modal-card">
+                <div class="modal-top">
+                    <h3 id="modalTitle">כותרת</h3>
+                    <button class="modal-x" id="modalX" aria-label="סגור"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="modalBody" class="modal-body"></div>
+                <div class="modal-foot">
+                    <button class="btn-main" id="modalSave">שמור</button>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== Bottom Navigation ==================== -->
-        <nav class="bottom-nav" role="tablist" aria-label="ניווט ראשי">
-            <button class="nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard">
-                <i class="fas fa-home" aria-hidden="true"></i>
-                <span>ראשי</span>
-            </button>
-            <button class="nav-item" data-tab="expenses" role="tab" aria-selected="false" aria-controls="expenses">
-                <i class="fas fa-receipt" aria-hidden="true"></i>
-                <span>תקציב</span>
-            </button>
-            <button class="nav-item" data-tab="guests" role="tab" aria-selected="false" aria-controls="guests">
-                <i class="fas fa-users" aria-hidden="true"></i>
-                <span>אורחים</span>
-            </button>
+        <!-- Toast -->
+        <div id="toasts" class="toast-wrap"></div>
+
+        <!-- Nav -->
+        <nav class="bottom-nav" role="tablist">
+            <button class="nav-tab active" data-tab="secDashboard" role="tab"><i class="fas fa-home"></i><span>ראשי</span></button>
+            <button class="nav-tab" data-tab="secExpenses" role="tab"><i class="fas fa-wallet"></i><span>תקציב</span></button>
+            <button class="nav-tab" data-tab="secGuests" role="tab"><i class="fas fa-users"></i><span>אורחים</span></button>
+            <button class="nav-tab" data-tab="secTasks" role="tab"><i class="fas fa-clipboard-check"></i><span>משימות</span></button>
         </nav>
     </div>
 
-    <!-- JS - deferred for non-blocking load -->
     <script src="script.js" defer></script>
 </body>
 </html>
